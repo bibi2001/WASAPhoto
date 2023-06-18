@@ -1,0 +1,414 @@
+openapi: 3.0.3
+info:
+  title: WASAPhoto
+  description: |-
+    Keep in touch with your friends by sharing photos of special moment, 
+    thanks to WASAPhoto! You can upload your photos directly from your 
+    PC, and they will be visible to everyone following you.
+  version: 1.0.0
+paths:
+  /session:
+    post:
+      tags: ["login"]
+      summary: Logs in the user
+      description: |-
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                type: string
+                example: Maria
+                pattern: 'ˆ.*?$'
+                minLength: 3
+                maxLength: 16
+        required: true
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                  # change here if you decide to use an integer
+                  # or any other type of identifier
+                  type: string
+                  example: "abcdef012345"
+  /users/{username}:
+    get:
+      tags: 
+        - users
+      summary: get user profile by username
+      description: show the profile of the user that has the given username
+      operationId: getUser
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: invalid username supplied
+        '404':
+          description: user not found
+    post:
+      tags:
+        - users
+      summary: follow a user
+      description: follow the user with the searched username
+      operationId: followUser
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        '200': {description: sucessfully followed user"}
+        '400': {description: invalid username supplied}
+        '404': {description: user not found}
+    delete:
+      tags:
+        - users
+      summary: unfollow a user
+      description: unfollow the user with the searched username
+      operationId: unfollowUser
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        '200': {description: sucessfully unfollowed user"}
+        '400': {description: invalid username supplied}
+        '404': {description: user not found}
+    put:
+      tags:
+        - users
+      summary: update user
+      description: this can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - $ref: "#/components/parameters/username"
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+  /user/self/feed:
+    get:
+      tags:
+        - users
+      summary: see the authenticated user's feed
+      description: see the user's feed in reverse chronological order
+      operationId: getMyStream
+      responses:
+        '200':
+          description: feed sucessfuly shown
+          content:
+            application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Photo' 
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+  /user/{username}/media:
+    get:
+      tags:
+        - users
+      summary: show user's profile
+      description:  |
+        show the user's profile, that contains:
+        the user’s photos (in reverse chronological order), how many photos have 
+        been uploaded, and the user’s followers and following.
+      operationId: getUserProfile
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        '200':
+          description: sucessfuly showing user's profile
+          content:
+            
+            application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Photo' 
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+            
+  /photo:
+    post:
+      tags:
+        - photo
+      summary: upload photo
+      description: upload a new photo by the authenticated user
+      operationId: uploadPhoto
+      requestBody:
+        description: Create a new pet in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Photo'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Photo'
+        required: true
+      responses:
+        '200':
+          description: Photo sucessfuly uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Photo'
+  /{PhotoId}:
+    delete:
+      tags:
+        - photo
+      summary: delete photo with the given Id
+      description: delete a photo that was posted by the authenticated user
+      operationId: deletePhoto
+      parameters:
+        - $ref: "#/components/parameters/PhotoId"
+      responses:
+        '200': {description: Photo sucessfuly delete}
+        "404": { description: Photo not found }
+  /{PhotoId}/comments:
+    get:
+      tags:
+        - comments
+      summary: list all comments in photo with the given Id
+      description: list all the comments in a photo
+      operationId: getComments
+      parameters:
+        - $ref: "#/components/parameters/PhotoId"
+      responses:
+        '200':
+          description: Sucessfully list comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/Comment'}
+    post:
+      tags:
+        - comments
+      summary: add a comment to a photo
+      description: add a comment to a photo given the id of the photo
+      operationId: commentPhoto
+      parameters:
+        - $ref: "#/components/parameters/PhotoId"
+      requestBody:
+        description: add a comment to an existing photo
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      responses:
+        '200':
+          description: Sucessfully uploaded comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Photo not found
+  /{PhotoId}/comments/{commentId}:
+    delete:
+      tags:
+        - comments
+      summary: uncomment a photo
+      description: delete a comment on a photo from the user's own photo
+      operationId: uncommentPhoto
+      parameters:
+        - $ref: "#/components/parameters/PhotoId"
+        - name: commentId
+          in: path
+          schema:
+            type: string
+          description: the id of the comment
+          required: true
+      responses:
+        '200':
+          description: comment sucessfuly deleted
+        '400':
+          description: invalid ID supplied
+        '404':
+          description: comment or photo not found
+  /{PhotoId}/likes:
+    get:
+      tags:
+        - likes
+      summary: get a list of users who liked the photo with the id
+      description: get a list of users who liked the photo with the id
+      parameters:
+        - $ref: "#/components/parameters/PhotoId"
+      responses:
+        '200':
+          description: list all the users who liked the photo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: invalid ID supplied
+        '404':
+          description: comment or photo not found
+    post:
+      tags:
+        - likes
+      summary: like the photo with the id
+      description: like the photo with the id with the authenticated user
+      operationId: likePhoto
+      parameters:
+        - $ref: "#/components/parameters/PhotoId"
+      responses:
+        '200':
+          description: sucessfuly liked the photo
+        '400':
+          description: invalid ID supplied
+        '404':
+          description: photo not found
+    delete:
+      tags:
+        - likes
+      summary: unlike the photo with the id
+      description: remove the aunthenticated user's like from the photo with the id
+      operationId: unlikePhoto
+      parameters:
+        - $ref: "#/components/parameters/PhotoId"
+      responses:
+        '200':
+          description: sucessfuly unliked the photo
+        '400':
+          description: invalid ID supplied
+        '404':
+          description: photo not found
+
+components:
+  parameters:
+    username:
+      schema:
+        type: string
+      name: username
+      in: path
+      description: 'The name that needs to be fetched.'
+      required: true
+    PhotoId:
+      schema:
+        type: integer
+        example: 1
+        readOnly: true
+      name: PhotoId
+      in: path
+      required: true
+      description: Photo Id
+  schemas:
+    Photo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int 64
+          example: 10
+        user:
+          $ref: '#/components/schemas/User'
+        comments:
+          type: array
+          items: {$ref: '#/components/schemas/Comment'}
+        likes:
+          type: array
+          items: {$ref: '#/components/schemas/User'}
+    Comment:
+      type: object
+      properties:
+        text:
+          type: string
+          example: 'what a cool photo'                                              
+        user:
+          $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: '12345'
+        phone:
+          type: string
+          example: '12345'
+        userStatus:
+          type: integer
+          description: User Status
+          format: int32
+          example: 1
+        following:
+          type: array
+          items: {$ref: '#/components/schemas/User'}
+        followers:
+          type: array
+          items: {$ref: '#/components/schemas/User'}
+        photos:
+          type: array
+          items: {$ref: '#/components/schemas/Photo'}
+            
+      xml:
+        name: user
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      xml:
+        name: tag
