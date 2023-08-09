@@ -24,11 +24,11 @@ paths:
               type: object
               properties:
                 name:
-                type: string
-                example: Maria
-                pattern: 'ˆ.*?$'
-                minLength: 3
-                maxLength: 16
+                  type: string
+                  example: Maria
+                  pattern: 'ˆ.*?$'
+                  minLength: 3
+                  maxLength: 16
         required: true
       responses:
         '201':
@@ -39,10 +39,10 @@ paths:
                 type: object
                 properties:
                   identifier:
-                  # change here if you decide to use an integer
-                  # or any other type of identifier
-                  type: string
-                  example: "abcdef012345"
+                    # change here if you decide to use an integer
+                    # or any other type of identifier
+                    type: string
+                    example: "abcdef012345"
   /users/{username}:
     get:
       tags: 
@@ -189,7 +189,7 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Photo'
-  /{PhotoId}:
+  /photo/{PhotoId}:
     delete:
       tags:
         - photo
@@ -201,7 +201,23 @@ paths:
       responses:
         '200': {description: Photo sucessfuly delete}
         "404": { description: Photo not found }
-  /{PhotoId}/comments:
+    post:
+      tags:
+        - likes
+      summary: like the photo with the id
+      description: like the photo with the id with the authenticated user
+      operationId: likePhoto
+      parameters:
+        - $ref: "#/components/parameters/PhotoId"
+      responses:
+        '200':
+          description: sucessfuly liked the photo
+        '400':
+          description: invalid ID supplied
+        '404':
+          description: photo not found
+          
+  /photo/{PhotoId}/comments:
     get:
       tags:
         - comments
@@ -266,7 +282,7 @@ paths:
           description: invalid ID supplied
         '404':
           description: comment or photo not found
-  /{PhotoId}/likes:
+  /photo/{PhotoId}/likes:
     get:
       tags:
         - likes
@@ -287,21 +303,6 @@ paths:
           description: invalid ID supplied
         '404':
           description: comment or photo not found
-    post:
-      tags:
-        - likes
-      summary: like the photo with the id
-      description: like the photo with the id with the authenticated user
-      operationId: likePhoto
-      parameters:
-        - $ref: "#/components/parameters/PhotoId"
-      responses:
-        '200':
-          description: sucessfuly liked the photo
-        '400':
-          description: invalid ID supplied
-        '404':
-          description: photo not found
     delete:
       tags:
         - likes
