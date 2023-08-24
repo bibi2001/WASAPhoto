@@ -57,8 +57,8 @@ paths:
   /home:
     get:
       tags: ["stream"]
-      summary: see the authenticated user's feed
-      description: see the user's feed in reverse chronological order
+      summary: authenticated user's feed
+      description: see the authenticated user's feed in reverse chronological order
       operationId: getMyStream
       responses:
         '200':
@@ -69,6 +69,8 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/Photo' 
+        '404':
+          description: "no posts found"
       security:
       - bearerAuth: [] 
   /users/search:
@@ -84,6 +86,13 @@ paths:
             example: jonhDoe
           description: search query
           required: true
+        - name: limit
+          in: query
+          schema: 
+            type: integer
+            default: 9
+          description: limit of users to show
+          required: false
       responses:
         '200':
           description: list of found users which username matches the query
@@ -136,14 +145,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  example: jonhDoe
-                  pattern: 'ˆ.*?$'
-                  minLength: 3
-                  maxLength: 16
+              $ref: '#/components/schemas/Username'
       responses:
         default:
           description: successful operation
@@ -184,9 +186,48 @@ paths:
       security:
       - bearerAuth: []
       
+  /users/{username}/bans:
+    post:
+      tags: ["bans"]
+      summary: ban a user
+      description: ban the user with the username given, a user can't ban themself
+      operationId: banUser
+      parameters:
+      - $ref: "#/components/parameters/username"
+      responses:
+        '200': {description: sucessfully banned user"}
+        '400': {description: invalid username supplied}
+        '404': {description: user not found}
+      security:
+      - bearerAuth: []
+  
+  /users/{username}/bans/{authUsername}:
+    delete:
+      tags: ["bans"]
+      summary: unban a user
+      description: unban the user with the username given
+      operationId: unbanUser
+      parameters:
+        - $ref: "#/components/parameters/username"
+        - name: authUsername
+          in: path
+          schema:
+            type: string
+          description: the username of the authenticated user
+          required: true
+      responses:
+        '200': 
+          description: Successfully unfollowed user
+        '400': 
+          description: Invalid username supplied
+        '404': 
+          description: User not found
+      security:
+      - bearerAuth: []
+
   /photo:
     post:
-      tags: ["photo"]
+      tags: ["photos"]
       summary: upload photo
       description: upload a new photo by the authenticated user
       operationId: uploadPhoto
@@ -194,7 +235,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Photo'
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  minLength: 1
+                  maxLength: 32505856 
         required: true
       responses:
         '200':
@@ -207,8 +254,7 @@ paths:
       - bearerAuth: []
   /photo/{photoId}:
     delete:
-      tags:
-        - photo
+      tags: ["photos"]
       summary: delete photo with the given Id
       description: delete a photo that was posted by the authenticated user
       operationId: deletePhoto
@@ -239,8 +285,7 @@ paths:
       security:
       - bearerAuth: [] 
     post:
-      tags:
-        - comments
+      tags: ["comments"]
       summary: add a comment to a photo
       description: add a comment to a photo given the id of the photo
       operationId: commentPhoto
@@ -266,7 +311,7 @@ paths:
           description: Photo not found
       security:
       - bearerAuth: [] 
-  /{photoId}/comments/{commentId}:
+  /photo/{photoId}/comments/{commentId}:
     delete: 
       tags: ["comments"]
       summary: uncomment a photo
@@ -277,7 +322,8 @@ paths:
         - name: commentId
           in: path
           schema:
-            type: string
+            type: integer
+            example: 10
           description: the id of the comment
           required: true
       responses:
@@ -297,6 +343,7 @@ paths:
       description: get a list of users who liked the photo with the id
       parameters:
         - $ref: "#/components/parameters/photoId"
+      
       responses:
         '200':
           description: list all the users who liked the photo
@@ -305,7 +352,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Username'
         '400':
           description: invalid ID supplied
         '404':
@@ -330,8 +377,7 @@ paths:
       - bearerAuth: [] 
   /photo/{photoId}/likes/{likeId}:
     delete:
-      tags:
-        - likes
+      tags: ["likes"]
       summary: unlike the photo with the id
       description: remove the aunthenticated user's like from the photo with the id
       operationId: unlikePhoto
@@ -340,7 +386,8 @@ paths:
         - name: likeId
           in: path
           schema:
-            type: string
+            type: integer
+            example: 10
           description: the id of the like
           required: true
       responses:
@@ -355,6 +402,12 @@ paths:
 
 components:
   schemas:
+    Username:
+      type: string
+      example: jonhDoe
+      pattern: 'ˆ.*?$'
+      minLength: 3
+      maxLength: 16
     User:
       type: object
       properties:
@@ -383,13 +436,25 @@ components:
         users:
           type: array
           minItems: 1
-          items: {$ref: '#/components/schemas/User'}
+          items: 
+            type: object
+            properties:
+              username:
+                type: string
+                example: jonhDoe
+                pattern: 'ˆ.*?$'
+                minLength: 3
+                maxLength: 16
+          
     UserProfile:
       type: object
       properties:
         username:
           type: string
           example: jonhDoe
+        name:
+          type: string
+          example: Jonh Doe
         numberPosts:
           description: number of posts
           type: integer
@@ -399,6 +464,10 @@ components:
         following:
           description: number of users followed
           type: integer
+        isFollowed:
+          description: is the user followed by the authenticated user
+          type: boolean
+          default: false
         photos:
           type: array
           items: {$ref: '#/components/schemas/Photo'}
@@ -409,32 +478,49 @@ components:
           type: integer
           format: int 64
           example: 10
-        user:
-          $ref: '#/components/schemas/User'
-        comments:
-          type: array
-          items: {$ref: '#/components/schemas/Comment'}
+        username:
+          type: string
+          example: jonhDoe
+        nComments:
+          description: number of comments on the photo
+          type: integer
+          format: int 64
+          default: 0
         likes:
-          type: array
-          items: {$ref: '#/components/schemas/User'}
+          description: number of likes on the photo
+          type: integer
+          format: int 64
+          default: 0
+        isLiked:
+          description: is the photo liked by the authenticated user
+          type: boolean
+          default: false
         date:
           description: upload date
           type: string
           format: date-time
+        image:
+          type: string
+          format: binary
+          minLength: 1
+          maxLength: 32505856 
         caption:
           type: string
           minLength: 1
-          maxLength: 200
+          maxLength: 90
           example: "sunny day at the beach"
     Comment:
       type: object
       properties:
         text:
           type: string
-          example: 'what a cool photo'                                              
-        user:
-          $ref: '#/components/schemas/User'
-  
+          example: 'what a cool photo'
+        username:
+          type: string
+          example: jonhDoe
+        photo:
+          $ref: '#/components/schemas/Photo'
+          
   parameters:
     username:
       schema:
@@ -448,7 +534,6 @@ components:
       schema:
         type: integer
         example: 1
-        readOnly: true
       name: photoId
       in: path
       required: true
