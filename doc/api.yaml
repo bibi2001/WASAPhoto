@@ -408,24 +408,6 @@ components:
       pattern: 'ˆ.*?$'
       minLength: 3
       maxLength: 16
-    User:
-      type: object
-      properties:
-        username:
-          type: string
-          example: jonhDoe
-        name:
-          type: string
-          example: John Doe
-        following:
-          type: array
-          items: {$ref: '#/components/schemas/User'}
-        followers:
-          type: array
-          items: {$ref: '#/components/schemas/User'}
-        photos:
-          type: array
-          items: {$ref: '#/components/schemas/Photo'}
     UserList:
       type: object
       properties:
