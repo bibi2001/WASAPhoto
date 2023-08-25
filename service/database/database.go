@@ -36,11 +36,29 @@ import (
 	"fmt"
 )
 
+type Comment struct {
+	commentId int64
+	photoId   int64
+	username  string
+	text      string
+}
+
+type Photo struct {
+	photoId  int64
+	username string
+	date 	 string
+	caption  string
+}
+
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	uploadPhoto(picture string) (string, error)
 	deletePhoto(photoId int) error
 
+	commentPhoto(username string, photoId int64, text string) (Comment, error)
+	uncommentPhoto(commentId uint64) error 
+
+	deletePhoto()
 	Ping() error
 }
 
@@ -89,7 +107,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='comments';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "comments" (
-			"commentId"	INTEGER NOT NULL,
+			"commentId"	INTEGER NOT NULL AUTOINCREMENT,
 			"photoId"	INTEGER NOT NULL,
 			"username"	TEXT NOT NULL,
 			"text"	TEXT NOT NULL,
