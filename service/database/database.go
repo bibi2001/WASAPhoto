@@ -38,8 +38,8 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetName() (string, error)
-	SetName(name string) error
+	uploadPhoto(picture string) (string, error)
+	deletePhoto(photoId int) error
 
 	Ping() error
 }
