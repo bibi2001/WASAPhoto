@@ -57,9 +57,91 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
+		sqlStmt := `CREATE TABLE "users" (
+			"username"	TEXT NOT NULL,
+			"name"	TEXT,
+			PRIMARY KEY("username")
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='photos';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		sqlStmt := `CREATE TABLE "photos" (
+			"photoId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			"username"	TEXT NOT NULL,
+			"date"	TEXT NOT NULL,
+			"caption"	TEXT,
+			FOREIGN KEY("username") REFERENCES "users"("username")
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='comments';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		sqlStmt := `CREATE TABLE "comments" (
+			"commentId"	INTEGER NOT NULL,
+			"photoId"	INTEGER NOT NULL,
+			"username"	TEXT NOT NULL,
+			"text"	TEXT NOT NULL,
+			FOREIGN KEY("photoId") REFERENCES "photos"("photoId"),
+			FOREIGN KEY("username") REFERENCES "users"("username"),
+			PRIMARY KEY("commentId")
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='likes';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		sqlStmt := `CREATE TABLE "likes" (
+			"username"	TEXT NOT NULL,
+			"photoId"	INTEGER NOT NULL,
+			FOREIGN KEY("username") REFERENCES "users"("username"),
+			FOREIGN KEY("photoId") REFERENCES "photos"("photoId"),
+			PRIMARY KEY("username","photoId")
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='follows';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		sqlStmt := `CREATE TABLE "follows" (
+			"authUser"	TEXT NOT NULL,
+			"followedUser"	TEXT NOT NULL,
+			FOREIGN KEY("authUser") REFERENCES "users"("username"),
+			FOREIGN KEY("followedUser") REFERENCES "users"("username"),
+			PRIMARY KEY("followedUser","authUser")
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='bans';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		sqlStmt := `CREATE TABLE "bans" (
+			"authUser"	TEXT NOT NULL,
+			"bannedUser"	TEXT NOT NULL,
+			FOREIGN KEY("authUser") REFERENCES "users"("username"),
+			FOREIGN KEY("bannedUser") REFERENCES "users"("username"),
+			PRIMARY KEY("authUser","bannedUser")
+		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
