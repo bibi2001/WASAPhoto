@@ -253,19 +253,32 @@ paths:
                 $ref: '#/components/schemas/Photo'
       security:
       - bearerAuth: []
-  /photo/{photoId}:
+  /photo/{photoId}:  
+    parameters:
+      - $ref: "#/components/parameters/photoId"
     delete:
       tags: ["photos"]
       summary: delete photo with the given Id
       description: delete a photo that was posted by the authenticated user
       operationId: deletePhoto
-      parameters:
-        - $ref: "#/components/parameters/photoId"
       responses:
         '200': {description: Photo sucessfuly delete}
-        "404": { description: Photo not found }
+        '404': { description: Photo not found }
       security:
       - bearerAuth: [] 
+    get:
+      tags: ["photos"]
+      summary: get photo with the given Id
+      description: show the photo with the given Id
+      operationId: getPhoto
+      responses:
+        '200':
+          description: Sucessfully uploaded comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+        '404': { description: Photo not found }
           
   /photo/{photoId}/comments:
     get:

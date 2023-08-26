@@ -66,6 +66,10 @@ type AppDatabase interface {
 	likePhoto(username string, photoId int64) error
 	unlikePhoto(username string, photoId int64) error
 	listLikes(photoId int64) (username []string, error)
+
+	banUser(authUsername string, bannedUsername string)
+	unbanUser(authUsername string, bannedUsername string) error
+	listBans(authUsername string) ([]string, error)
 	
 	Ping() error
 }
