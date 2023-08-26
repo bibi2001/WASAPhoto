@@ -272,7 +272,7 @@ paths:
       tags: ["comments"]
       summary: list all comments in photo with the given Id
       description: list all the comments in a photo
-      operationId: getComments
+      operationId: listComments
       parameters:
         - $ref: "#/components/parameters/photoId"
       responses:
@@ -338,13 +338,13 @@ paths:
       - bearerAuth: [] 
       
   /photo/{photoId}/likes:
+    parameters:
+      - $ref: "#/components/parameters/photoId"
     get:
       tags: ["likes"]
       summary: get a list of users who liked the photo with the id
       description: get a list of users who liked the photo with the id
-      parameters:
-        - $ref: "#/components/parameters/photoId"
-      
+      operationId: listLikes
       responses:
         '200':
           description: list all the users who liked the photo
@@ -365,8 +365,6 @@ paths:
       summary: like the photo with the id
       description: like the photo with the id with the authenticated user
       operationId: likePhoto
-      parameters:
-        - $ref: "#/components/parameters/photoId"
       responses:
         '200':
           description: sucessfuly liked the photo
@@ -376,21 +374,10 @@ paths:
           description: photo not found
       security:
       - bearerAuth: [] 
-  /photo/{photoId}/likes/{likeId}:
     delete:
-      tags: ["likes"]
       summary: unlike the photo with the id
       description: remove the aunthenticated user's like from the photo with the id
       operationId: unlikePhoto
-      parameters:
-        - $ref: "#/components/parameters/photoId"
-        - name: likeId
-          in: path
-          schema:
-            type: integer
-            example: 10
-          description: the id of the like
-          required: true
       responses:
         '200':
           description: sucessfuly unliked the photo

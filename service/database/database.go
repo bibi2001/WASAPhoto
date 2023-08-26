@@ -42,6 +42,10 @@ type Comment struct {
 	username  string
 	text      string
 }
+type SimpleComment struct {
+	username  string
+	text      string
+}
 
 type Photo struct {
 	photoId  int64
@@ -57,8 +61,12 @@ type AppDatabase interface {
 
 	commentPhoto(username string, photoId int64, text string) (Comment, error)
 	uncommentPhoto(commentId uint64) error 
+	listComments(photoId int64) ([]SimpleComment, error)
 
-	deletePhoto()
+	likePhoto(username string, photoId int64) error
+	unlikePhoto(username string, photoId int64) error
+	listLikes(photoId int64) (username []string, error)
+	
 	Ping() error
 }
 
