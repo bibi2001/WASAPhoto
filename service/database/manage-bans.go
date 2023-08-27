@@ -6,6 +6,7 @@ func (db *appdbimpl) banUser(authUser string, bannedUser string) error {
 	if err != nil {
 		return nil, err
 	}
+	unfollowUser(authUser, bannedUser)
 
 	return nil
 }
