@@ -69,9 +69,7 @@ paths:
                 schema:
                   type: array
                   items:
-                    $ref: '#/components/schemas/Photo' 
-        '404':
-          description: "no posts found"
+                    $ref: '#/components/schemas/Photo'
       security:
       - bearerAuth: [] 
   /users/search:
@@ -96,15 +94,15 @@ paths:
           required: false
       responses:
         '200':
-          description: list of found users which username matches the query
+          description: Successfully show list of users
           content:
             application/json:
               schema:
                $ref: '#/components/schemas/UserList'
         '400':
-          description: invalid search query
+          description: Invalid query supplied
         '404':
-          description: user not found
+          description: Users not found
       security:
       - bearerAuth: []
     
@@ -121,15 +119,15 @@ paths:
         - $ref: "#/components/parameters/username"
       responses:
         '200':
-          description: sucessfuly showing user's profile
+          description: Sucessfuly show user profile
           content:
             application/json:
                 schema:
                   $ref: '#/components/schemas/UserProfile'
         '400':
-          description: invalid username supplied
+          description: Invalid parameters supplied
         '404':
-          description: user not found
+          description: User not found
       security:
       - bearerAuth: []
   /user/{username}/username:
@@ -148,8 +146,12 @@ paths:
             schema:
               $ref: '#/components/schemas/Username'
       responses:
-        default:
-          description: successful operation
+        '200': 
+          description: Sucessfully changed username
+        '400':
+          description: Invalid parameters supplied
+        '404': 
+          description: User not found
       security:
       - bearerAuth: []
   /users/{username}/followers:
@@ -161,12 +163,15 @@ paths:
       description: follow the user with the username given, a user can't follow themselves
       operationId: followUser
       responses:
-        '200': {description: sucessfully followed user"}
-        '400': {description: invalid username supplied}
-        '404': {description: user not found}
+        '201': 
+          description: Sucessfully followed user
+        '400':
+          description: Invalid parameters supplied
+        '404': 
+          description: User not found
       security:
       - bearerAuth: []
-  /users/{username}/followers/{followerId}:
+  /users/{username}/followers/{followUsername}:
     delete:
       tags: ["follows"]
       summary: unfollow a user
@@ -174,16 +179,19 @@ paths:
       operationId: unfollowUser
       parameters:
         - $ref: "#/components/parameters/username"
-        - name: followerId
+        - name: followUsername
           in: path
           schema:
             type: string
-          description: the id of the follower
+          description: the username of the user to follow
           required: true
       responses:
-        '200': {description: sucessfully unfollowed user"}
-        '400': {description: invalid username supplied}
-        '404': {description: user not found}
+        '204': 
+          description: Sucessfully unfollowed user
+        '400':
+          description: Invalid parameters supplied
+        '404': 
+          description: User not found
       security:
       - bearerAuth: []
       
@@ -196,13 +204,16 @@ paths:
       parameters:
       - $ref: "#/components/parameters/username"
       responses:
-        '200': {description: sucessfully banned user"}
-        '400': {description: invalid username supplied}
-        '404': {description: user not found}
+        '201': 
+          description: Sucessfully banned user
+        '400':
+          description: Invalid parameters supplied
+        '404': 
+          description: User not found
       security:
       - bearerAuth: []
   
-  /users/{username}/bans/{authUsername}:
+  /users/{authUsername}/bans/{username}:
     delete:
       tags: ["bans"]
       summary: unban a user
@@ -217,10 +228,10 @@ paths:
           description: the username of the authenticated user
           required: true
       responses:
-        '200': 
-          description: Successfully unfollowed user
-        '400': 
-          description: Invalid username supplied
+        '204': 
+          description: Sucessfully unbanned user
+        '400':
+          description: Invalid parameters supplied
         '404': 
           description: User not found
       security:
@@ -245,12 +256,14 @@ paths:
                   maxLength: 32505856 
         required: true
       responses:
-        '200':
+        '201':
           description: Photo sucessfuly uploaded
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Photo'
+        '400':
+          description: Invalid request body supplied
       security:
       - bearerAuth: []
   /photo/{photoId}:  
@@ -262,8 +275,12 @@ paths:
       description: delete a photo that was posted by the authenticated user
       operationId: deletePhoto
       responses:
-        '200': {description: Photo sucessfuly delete}
-        '404': { description: Photo not found }
+        '204': 
+          description: Photo sucessfuly delete
+        '400':
+          description: Invalid parameters supplied
+        '404': 
+          description: Photo not found
       security:
       - bearerAuth: [] 
     get:
@@ -273,12 +290,15 @@ paths:
       operationId: getPhoto
       responses:
         '200':
-          description: Sucessfully uploaded comment
+          description: Sucessfully showed photo 
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Photo'
-        '404': { description: Photo not found }
+        '400':
+          description: Invalid parameters supplied
+        '404': 
+          description: Photo not found
           
   /photo/{photoId}/comments:
     get:
@@ -296,6 +316,10 @@ paths:
               schema:
                 type: array
                 items: {$ref: '#/components/schemas/Comment'}
+        '400':
+          description: Invalid parameters supplied
+        '404':
+          description: Photo not found
       security:
       - bearerAuth: [] 
     post:
@@ -313,14 +337,14 @@ paths:
               $ref: '#/components/schemas/Comment'
         required: true
       responses:
-        '200':
+        '201':
           description: Sucessfully uploaded comment
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
         '400':
-          description: Invalid ID supplied
+          description: Invalid parameters or request body supplied
         '404':
           description: Photo not found
       security:
@@ -341,12 +365,12 @@ paths:
           description: the id of the comment
           required: true
       responses:
-        '200':
-          description: comment sucessfuly deleted
+        '204':
+          description: Comment sucessfuly deleted
         '400':
-          description: invalid ID supplied
+          description: Invalid parameters supplied
         '404':
-          description: comment or photo not found
+          description: Comment or Photo not found
       security:
       - bearerAuth: [] 
       
@@ -360,7 +384,7 @@ paths:
       operationId: listLikes
       responses:
         '200':
-          description: list all the users who liked the photo
+          description: Successfully list photo likes
           content:
             application/json:
               schema:
@@ -368,9 +392,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/Username'
         '400':
-          description: invalid ID supplied
-        '404':
-          description: comment or photo not found
+          description: Invalid parameters supplied
+        '404': 
+          description: Photo not found
       security:
       - bearerAuth: []
     post:
@@ -379,12 +403,12 @@ paths:
       description: like the photo with the id with the authenticated user
       operationId: likePhoto
       responses:
-        '200':
-          description: sucessfuly liked the photo
+        '201':
+          description: Sucessfuly liked photo
         '400':
-          description: invalid ID supplied
-        '404':
-          description: photo not found
+          description: Invalid parameters supplied
+        '404': 
+          description: Photo not found
       security:
       - bearerAuth: [] 
     delete:
@@ -392,12 +416,12 @@ paths:
       description: remove the aunthenticated user's like from the photo with the id
       operationId: unlikePhoto
       responses:
-        '200':
-          description: sucessfuly unliked the photo
+        '204':
+          description: Sucessfuly unliked photo
         '400':
-          description: invalid ID supplied
-        '404':
-          description: photo not found
+          description: Invalid parameters supplied
+        '404': 
+          description: Photo not found
       security:
       - bearerAuth: [] 
 

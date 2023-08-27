@@ -50,25 +50,19 @@ type SimpleComment struct {
 type Photo struct {
 	photoId   int64
 	username  string
-	date 	  string
-	caption   string
-}
-type PostedPhoto struct {
-	photoId   int64
-	username  string
 	date      string
 	caption   string
 	nComments int64
-	nlikes    int64
+	nLikes    int64
 	isLiked   bool
 }
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	uploadPhoto(Photo) (PostedPhoto, error)
+	uploadPhoto(username string, caption string) (Photo, error)
 	deletePhoto(photoId int64) error
-	getPhoto(photoId int64) (PostedPhoto, error)
-	
+	getPhoto(photoId int64) (Photo, error)
+
 	commentPhoto(username string, photoId int64, text string) (Comment, error)
 	uncommentPhoto(commentId uint64) error 
 	listComments(photoId int64) ([]SimpleComment, error)
