@@ -33,11 +33,12 @@ func (db *appdbimpl) uncommentPhoto(commentId uint64) error {
 	return nil
 }
 
-func (db *appdbimpl) listComments(photoId int64) ([]SimpleComment, error) {
+func (db *appdbimpl) listComments(photoId int64) ([]Comment, error) {
 	var ret []SimpleComment
 
 	// Plain simple SELECT
-	rows, err := db.c.Query(`SELECT username, text FROM comments WHERE photoId=?`, photoId)
+	rows, err := db.c.Query(`SELECT commentId, photoId, username, text FROM comments WHERE photoId=?`,
+		photoId)
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +46,8 @@ func (db *appdbimpl) listComments(photoId int64) ([]SimpleComment, error) {
 
 	// Here we read the resultset and we build the list to be returned
 	for rows.Next() {
-		var c comments
-		err = rows.Scan(&c.username, &c.text)
+		var c Comment
+		err = rows.Scan(&c.commentId, &c.photoId, &c.username, &c.text)
 		if err != nil {
 			return nil, err
 		}

@@ -1,8 +1,8 @@
 package database
 
-func (db *appdbimpl) banUser(authUsername string, bannedUsername string) error {
-	res, err := db.c.Exec(`INSERT INTO bans (authUsername, bannedUsername) VALUES (?, ?)`,
-		authUsername, bannedUsername)
+func (db *appdbimpl) banUser(authUser string, bannedUser string) error {
+	res, err := db.c.Exec(`INSERT INTO bans (authUser, bannedUser) VALUES (?, ?)`,
+		authUser, bannedUser)
 	if err != nil {
 		return nil, err
 	}
@@ -10,10 +10,10 @@ func (db *appdbimpl) banUser(authUsername string, bannedUsername string) error {
 	return nil
 }
 
-var ErrBanDoesNotExist = errors.New("The ban does not exist!")
-func (db *appdbimpl) unbanUser(authUsername string, bannedUsername string) error {
-	res, err := db.c.Exec(`DELETE FROM bans WHERE authUsername=? AND bannedUsername=?`, 
-		authUsername, bannedUsername)
+var ErrBanDoesNotExist = errors.New("The user is not banned!")
+func (db *appdbimpl) unbanUser(authUser string, bannedUser string) error {
+	res, err := db.c.Exec(`DELETE FROM bans WHERE authUser=? AND bannedUser=?`, 
+		authUser, bannedUser)
 	if err != nil {
 		return err
 	}
@@ -28,12 +28,12 @@ func (db *appdbimpl) unbanUser(authUsername string, bannedUsername string) error
 	return nil
 }
 
-func (db *appdbimpl) listBans(authUsername string) ([]string, error) {
+func (db *appdbimpl) listBans(authUser string) ([]string, error) {
 	var ret []string
 
 	// Plain simple SELECT
-	rows, err := db.c.Query(`SELECT bannedUsername FROM bans WHERE authUsername=?`, 
-		authUsername)
+	rows, err := db.c.Query(`SELECT bannedUser FROM bans WHERE authUser=?`, 
+		authUser)
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +41,8 @@ func (db *appdbimpl) listBans(authUsername string) ([]string, error) {
 
 	// Here we read the resultset and we build the list to be returned
 	for rows.Next() {
-		var b ban
-		err = rows.Scan(&b.username)
+		var b string
+		err = rows.Scan(&b)
 		if err != nil {
 			return nil, err
 		}

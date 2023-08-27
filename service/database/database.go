@@ -42,10 +42,6 @@ type Comment struct {
 	username  string
 	text      string
 }
-type SimpleComment struct {
-	username  string
-	text      string
-}
 
 type Photo struct {
 	photoId   int64
@@ -61,19 +57,24 @@ type Photo struct {
 type AppDatabase interface {
 	uploadPhoto(username string, caption string) (Photo, error)
 	deletePhoto(photoId int64) error
-	getPhoto(photoId int64) (Photo, error)
+	getPhoto(username string, photoId int64) (Photo, error)
 
 	commentPhoto(username string, photoId int64, text string) (Comment, error)
 	uncommentPhoto(commentId uint64) error 
-	listComments(photoId int64) ([]SimpleComment, error)
+	listComments(photoId int64) ([]Comment, error)
 
 	likePhoto(username string, photoId int64) error
 	unlikePhoto(username string, photoId int64) error
 	listLikes(photoId int64) (username []string, error)
 
-	banUser(authUsername string, bannedUsername string)
-	unbanUser(authUsername string, bannedUsername string) error
+	banUser(authUsername string, bannedUser string) error
+	unbanUser(authUsername string, bannedUser string) error
 	listBans(authUsername string) ([]string, error)
+
+	followUser(authUsername string, followedUser string) error
+	unfollowUser(authUsername string, followedUser string) error
+	listFollows(authUsername string) ([]string, error)
+
 	
 	Ping() error
 }
