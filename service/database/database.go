@@ -90,6 +90,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
+	// Enable foreign keys
+	stmt = "PRAGMA foreign_keys = ON"
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+	
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
 
@@ -105,7 +112,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
 		}
 	}
-
+	
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='photos';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "photos" (
@@ -114,6 +121,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 			"date"	TEXT NOT NULL,
 			"caption"	TEXT,
 			FOREIGN KEY("username") REFERENCES "users"("username")
+				ON DELETE CASCADE
+        		ON UPDATE CASCADE
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -128,9 +137,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 			"photoId"	INTEGER NOT NULL,
 			"username"	TEXT NOT NULL,
 			"text"	TEXT NOT NULL,
-			FOREIGN KEY("photoId") REFERENCES "photos"("photoId"),
-			FOREIGN KEY("username") REFERENCES "users"("username"),
-			PRIMARY KEY("commentId")
+			PRIMARY KEY("commentId"),
+			FOREIGN KEY("photoId") REFERENCES "photos"("photoId")
+				ON DELETE CASCADE
+        		ON UPDATE CASCADE,
+			FOREIGN KEY("username") REFERENCES "users"("username")
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+			
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -143,9 +157,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 		sqlStmt := `CREATE TABLE "likes" (
 			"username"	TEXT NOT NULL,
 			"photoId"	INTEGER NOT NULL,
-			FOREIGN KEY("username") REFERENCES "users"("username"),
-			FOREIGN KEY("photoId") REFERENCES "photos"("photoId"),
-			PRIMARY KEY("username","photoId")
+			PRIMARY KEY("username","photoId"),
+			FOREIGN KEY("username") REFERENCES "users"("username")
+				ON DELETE CASCADE
+				ON UPDATE CASCADE,
+			FOREIGN KEY("photoId") REFERENCES "photos"("photoId")
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+			
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -158,9 +177,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 		sqlStmt := `CREATE TABLE "follows" (
 			"authUser"	TEXT NOT NULL,
 			"followedUser"	TEXT NOT NULL,
-			FOREIGN KEY("authUser") REFERENCES "users"("username"),
-			FOREIGN KEY("followedUser") REFERENCES "users"("username"),
-			PRIMARY KEY("followedUser","authUser")
+			PRIMARY KEY("followedUser","authUser"),
+			FOREIGN KEY("authUser") REFERENCES "users"("username")
+				ON DELETE CASCADE
+				ON UPDATE CASCADE,
+			FOREIGN KEY("followedUser") REFERENCES "users"("username")
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+			
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -173,9 +197,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 		sqlStmt := `CREATE TABLE "bans" (
 			"authUser"	TEXT NOT NULL,
 			"bannedUser"	TEXT NOT NULL,
-			FOREIGN KEY("authUser") REFERENCES "users"("username"),
-			FOREIGN KEY("bannedUser") REFERENCES "users"("username"),
-			PRIMARY KEY("authUser","bannedUser")
+			PRIMARY KEY("authUser","bannedUser"),
+			FOREIGN KEY("authUser") REFERENCES "users"("username")
+				ON DELETE CASCADE
+				ON UPDATE CASCADE,
+			FOREIGN KEY("bannedUser") REFERENCES "users"("username")
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+			
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
