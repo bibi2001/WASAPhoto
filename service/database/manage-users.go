@@ -25,4 +25,3 @@ func (db *appdbimpl) updateUsername(oldUsername string, newUsername string) erro
 
 	return nil
 }
-
