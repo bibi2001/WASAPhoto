@@ -4,9 +4,12 @@ func (db *appdbimpl) banUser(authUser string, bannedUser string) error {
 	res, err := db.c.Exec(`INSERT INTO bans (authUser, bannedUser) VALUES (?, ?)`,
 		authUser, bannedUser)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	unfollowUser(authUser, bannedUser)
+	err := unfollowUser(authUser, bannedUser)
+	if err!= nil && err!=ErrFollowDoesNotExist {
+		return err
+	}
 
 	return nil
 }

@@ -4,7 +4,7 @@ func (db *appdbimpl) followUser(authUser string, followedUser string) error {
 	res, err := db.c.Exec(`INSERT INTO follows (authUser, followedUser) VALUES (?, ?)`,
 		authUser, followedUser)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	return nil
