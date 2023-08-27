@@ -58,6 +58,7 @@ type AppDatabase interface {
 	uploadPhoto(username string, caption string) (Photo, error)
 	deletePhoto(photoId int64) error
 	getPhoto(username string, photoId int64) (Photo, error)
+	listUserPhotos(username string) ([]Photo, error)
 
 	commentPhoto(username string, photoId int64, text string) (Comment, error)
 	uncommentPhoto(commentId uint64) error 

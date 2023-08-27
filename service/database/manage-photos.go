@@ -69,7 +69,7 @@ func (db *appdbimpl) getPhoto(username string, photoId int64) (Photo, error) {
 	return p, nil
 }
 
-func (db *appdbimpl) listUserPhotos(username string) ([]string, error) {
+func (db *appdbimpl) listUserPhotos(username string) ([]Photo, error) {
 	var ret []string
 
 	// Plain simple SELECT
