@@ -1,8 +1,8 @@
 package database
 
-func (db *appdbimpl) followUser(authUser string, followedUser string) error {
-	res, err := db.c.Exec(`INSERT INTO follows (authUser, followedUser) VALUES (?, ?)`,
-		authUser, followedUser)
+func (db *appdbimpl) followUser(followingUser string, followedUser string) error {
+	res, err := db.c.Exec(`INSERT INTO follows (followingUser, followedUser) VALUES (?, ?)`,
+		followingUser, followedUser)
 	if err != nil {
 		return err
 	}
@@ -11,9 +11,9 @@ func (db *appdbimpl) followUser(authUser string, followedUser string) error {
 }
 
 var ErrFollowDoesNotExist = errors.New("The user is not followed!")
-func (db *appdbimpl) unfollowUser(authUser string, followedUser string) error {
-	res, err := db.c.Exec(`DELETE FROM follows WHERE authUser=? AND followedUser=?`, 
-		authUser, followedUser)
+func (db *appdbimpl) unfollowUser(followingUser string, followedUser string) error {
+	res, err := db.c.Exec(`DELETE FROM follows WHERE followingUser=? AND followedUser=?`, 
+		followingUser, followedUser)
 	if err != nil {
 		return err
 	}
@@ -28,12 +28,11 @@ func (db *appdbimpl) unfollowUser(authUser string, followedUser string) error {
 	return nil
 }
 
-func (db *appdbimpl) listFollows(authUser string) ([]string, error) {
+func (db *appdbimpl) listFollowRelationship(query string, username string) ([]string, error) {
 	var ret []string
 
 	// Plain simple SELECT
-	rows, err := db.c.Query(`SELECT followedUser FROM follows WHERE authUser=?`, 
-		authUser)
+	rows, err := db.c.Query(query, username)
 	if err != nil {
 		return nil, err
 	}
@@ -55,3 +54,10 @@ func (db *appdbimpl) listFollows(authUser string) ([]string, error) {
 
 	return ret, nil
 }
+
+func (db *appdbimpl) listFollowing(followingUser string) ([]string, error) {
+	return listFollowRelationship(`SELECT followedUser FROM follows WHERE followingUser=?`, username)
+
+func (db *appdbimpl) listFollowers(followedUser string) ([]string, error) {
+	return listFollowRelationship(`SELECT followingUser FROM follows WHERE followedUser=?`, username)
+	
