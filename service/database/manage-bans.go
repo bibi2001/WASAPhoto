@@ -6,8 +6,8 @@ func (db *appdbimpl) banUser(authUser string, bannedUser string) error {
 	if err != nil {
 		return err
 	}
-	err := unfollowUser(authUser, bannedUser)
-	if err!= nil && err!=ErrFollowDoesNotExist {
+	err := db.unfollowUser(authUser, bannedUser)
+	if err!= nil && err!=db.ErrFollowDoesNotExist {
 		return err
 	}
 

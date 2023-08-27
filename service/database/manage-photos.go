@@ -68,3 +68,36 @@ func (db *appdbimpl) getPhoto(username string, photoId int64) (Photo, error) {
 	
 	return p, nil
 }
+
+func (db *appdbimpl) listUserPhotos(username string) ([]string, error) {
+	var ret []string
+
+	// Plain simple SELECT
+	rows, err := db.c.Query(`SELECT photoId FROM photos WHERE username=?`, 
+		username)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+
+	// Here we read the resultset and we build the list to be returned
+	for rows.Next() {
+		var id int64
+		err = rows.Scan(&id)
+		if err != nil {
+			return nil, err
+		}
+		p, err := getPhoto(username, id)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, p)
+	}
+	
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
