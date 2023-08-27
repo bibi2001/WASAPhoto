@@ -71,9 +71,11 @@ type AppDatabase interface {
 	unbanUser(authUsername string, bannedUser string) error
 	listBans(authUsername string) ([]string, error)
 
-	followUser(authUsername string, followedUser string) error
-	unfollowUser(authUsername string, followedUser string) error
-	listFollows(authUsername string) ([]string, error)
+	followUser(followingUser string, followedUser string) error
+	unfollowUser(followingUser string, followedUser string) error
+	listFollowRelationship(query string, username string) ([]string, error)
+	listFollowing(followingUser string) ([]string, error)
+	listFollowers(followedUser string) ([]string, error)
 
 	
 	Ping() error
@@ -175,10 +177,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='follows';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "follows" (
-			"authUser"	TEXT NOT NULL,
+			"followingUser"	TEXT NOT NULL,
 			"followedUser"	TEXT NOT NULL,
-			PRIMARY KEY("followedUser","authUser"),
-			FOREIGN KEY("authUser") REFERENCES "users"("username")
+			PRIMARY KEY("followedUser","followingUser"),
+			FOREIGN KEY("followingUser") REFERENCES "users"("username")
 				ON DELETE CASCADE
 				ON UPDATE CASCADE,
 			FOREIGN KEY("followedUser") REFERENCES "users"("username")
