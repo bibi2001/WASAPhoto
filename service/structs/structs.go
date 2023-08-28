@@ -24,5 +24,6 @@ type UserProfile struct {
 	NFollowers int64   `json:"nFollowers"`
 	NFollowing int64   `json:"nFollowing"`
 	IsFollowed bool    `json:"isFollowed"`
+	IsBanned   bool    `json:"isbanned"`
 	Photos     []Photo `json:"photos"`
 }

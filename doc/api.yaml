@@ -472,6 +472,10 @@ components:
           description: is the user followed by the authenticated user
           type: boolean
           default: false
+        isBanned:
+          description: is the user banned by the authenticated user
+          type: boolean
+          default: false
         photos:
           type: array
           items: {$ref: '#/components/schemas/Photo'}
