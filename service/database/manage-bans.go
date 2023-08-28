@@ -59,3 +59,18 @@ func (db *appdbimpl) ListBans(authUser string) ([]string, error) {
 
 	return ret, nil
 }
+
+func (db *appdbimpl) IsBanned(authUser string, bannedUser string) (bool, error) {
+    var isBanned bool
+
+	// Plain simple SELECT
+    err := db.c.QueryRow(`SELECT EXISTS (
+        SELECT 1 FROM bans WHERE authUser=? AND bannedUser = ?
+    )`, authUser, bannedUser).Scan(&isBanned)
+
+    if err != nil {
+        return false, err
+    }
+
+    return isBanned, nil
+}

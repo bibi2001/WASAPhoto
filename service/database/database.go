@@ -38,30 +38,36 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	UploadPhoto(username string, caption string) (Photo, error)
-	DeletePhoto(photoId int64) error
-	GetPhoto(username string, photoId int64) (Photo, error)
-	ListUserPhotos(username string) ([]Photo, error)
+	
+	BanUser(authUsername string, bannedUser string) error
+	UnbanUser(authUsername string, bannedUser string) error
+	ListBans(authUsername string) ([]string, error)
+	IsBanned(authUser string, bannedUser string) (bool, error)
 
 	CommentPhoto(username string, photoId int64, text string) (Comment, error)
 	UncommentPhoto(commentId uint64) error 
 	ListComments(photoId int64) ([]Comment, error)
-
-	LikePhoto(username string, photoId int64) error
-	UnlikePhoto(username string, photoId int64) error
-	ListLikes(photoId int64) (username []string, error)
-
-	BanUser(authUsername string, bannedUser string) error
-	UnbanUser(authUsername string, bannedUser string) error
-	ListBans(authUsername string) ([]string, error)
 
 	FollowUser(followingUser string, followedUser string) error
 	UnfollowUser(followingUser string, followedUser string) error
 	ListFollowRelationship(query string, username string) ([]string, error)
 	ListFollowing(followingUser string) ([]string, error)
 	ListFollowers(followedUser string) ([]string, error)
+	IsFollowed(followingUser string, followedUser string) (bool, error)
 
-	
+	LikePhoto(username string, photoId int64) error
+	UnlikePhoto(username string, photoId int64) error
+	ListLikes(photoId int64) (username []string, error)
+
+	UploadPhoato(username string, caption string) (Photo, error)
+	DeletePhoto(photoId int64) error
+	GetPhoto(username string, photoId int64) (Photo, error)
+	ListUserPhotos(username string) ([]Photo, error)
+
+	CreateUser(username string, name string) error
+	UpdateUsername(oldUsername string, newUsername string) error
+	GetUserProfile(username string, authUser string) (UserProfile, error)
+
 	Ping() error
 }
 

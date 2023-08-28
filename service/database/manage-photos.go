@@ -70,7 +70,7 @@ func (db *appdbimpl) GetPhoto(username string, photoId int64) (Photo, error) {
 }
 
 func (db *appdbimpl) ListUserPhotos(username string) ([]Photo, error) {
-	var ret []string
+	var ret []Photo
 
 	// Plain simple SELECT
 	rows, err := db.c.Query(`SELECT photoId FROM photos WHERE username=?`, 
