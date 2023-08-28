@@ -64,9 +64,12 @@ type AppDatabase interface {
 	GetPhoto(username string, photoId int64) (Photo, error)
 	ListUserPhotos(username string) ([]Photo, error)
 
+	GetUserStream(username string) ([]Photo, error)
+	
 	CreateUser(username string, name string) error
 	UpdateUsername(oldUsername string, newUsername string) error
 	GetUserProfile(username string, authUser string) (UserProfile, error)
+	UserSearch(searchQuery string, authUser string) ([]string, error)
 
 	Ping() error
 }

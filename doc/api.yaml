@@ -77,6 +77,7 @@ paths:
       tags: ["users"]
       summary: search users
       description: search tab for searching other users
+      operationId: searchUsers
       parameters:
         - name: q
           in: query
@@ -85,13 +86,6 @@ paths:
             example: jonhDoe
           description: search query
           required: true
-        - name: limit
-          in: query
-          schema: 
-            type: integer
-            default: 9
-          description: limit of users to show
-          required: false
       responses:
         '200':
           description: Successfully show list of users

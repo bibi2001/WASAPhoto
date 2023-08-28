@@ -77,3 +77,37 @@ func (db *appdbimpl) GetUserProfile(username string, authUser string) (UserProfi
 
 	return up, nil
 }
+
+
+func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, error) {
+	var ret []string
+
+	// Simple SELECT query to get matches that aren't banned by the authenticated user
+	rows, err := db.c.Query(`
+		SELECT username FROM users  
+		WHERE username LIKE '%' || ? || '%'
+		AND username NOT IN (
+			SELECT bannedUsername FROM bans 
+			WHERE bannedUsername = username AND authUser = ?
+		)`, searchQuery, authUser)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+
+	// Here we read the resultset and we build the list to be returned
+	for rows.Next() {
+		var u string
+		err = rows.Scan(&u)
+		if err != nil {
+			return nil, err
+		}
+
+		ret = append(ret, u)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
