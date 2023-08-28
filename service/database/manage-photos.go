@@ -60,7 +60,7 @@ func (db *appdbimpl) GetPhoto(username string, photoId int64) (Photo, error) {
 	}
 	// Plain simple SELECT to get photo and user relation info on likes table
 	err:= db.c.Query(`SELECT EXISTS (
-		SELECT 1 FROM likes WHERE photoId = 0 AND username = 'jonhDoe'
+		SELECT 1 FROM likes WHERE photoId = ? AND username = ?
 		)`, photoId, username).Scan(&p.IsLiked)
 	if err != nil {
 		return nil, err
