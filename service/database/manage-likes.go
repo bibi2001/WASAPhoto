@@ -1,6 +1,6 @@
 package database
 
-func (db *appdbimpl) likePhoto(username string, photoId int64) error {
+func (db *appdbimpl) LikePhoto(username string, photoId int64) error {
 	res, err := db.c.Exec(`INSERT INTO likes (photoId, username) VALUES (?, ?)`,
 		photoId, username)
 	if err != nil {
@@ -11,7 +11,7 @@ func (db *appdbimpl) likePhoto(username string, photoId int64) error {
 }
 
 var ErrLikeDoesNotExist = errors.New("The like does not exist!")
-func (db *appdbimpl) unlikePhoto(username string, photoId int64) error {
+func (db *appdbimpl) UnlikePhoto(username string, photoId int64) error {
 	res, err := db.c.Exec(`DELETE FROM likes WHERE photoId=? AND username=?`, photoId, username)
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func (db *appdbimpl) unlikePhoto(username string, photoId int64) error {
 	return nil
 }
 
-func (db *appdbimpl) listLikes(photoId int64) ([]string, error) {
+func (db *appdbimpl) ListLikes(photoId int64) ([]string, error) {
 	var ret []string
 
 	// Plain simple SELECT

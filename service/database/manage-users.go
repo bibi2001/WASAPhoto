@@ -25,26 +25,42 @@ func (db *appdbimpl) updateUsername(oldUsername string, newUsername string) erro
 
 	return nil
 }
+type UserProfile struct {
+	Username   string  `json:"username"`
+	Name       string  `json:"name"`
+	NPosts     int64   `json:"nPosts"`
+	NFollowers int64   `json:"nFollowers"`
+	NFollowing int64   `json:"nFollowing"`
+	IsFollowed bool    `json:"isFollowed"`
+	IsBanned   bool    `json:"isbanned"`
+	Photos     []Photo `json:"photos"`
+}
 
+var ErrUserDoesNotExist = errors.New("The user does not exist!")
 func (db *appdbimpl) getUserProfile(username string) error {
-	var p Photo 
-	// Plain simple SELECT to get photo info on photos table
-	err := db.c.Query(`SELECT * FROM photos WHERE photoId=?`, photoId).Scan(
-		&p.photoId, &p.username, &p.date, &p.caption)
+	var up UserProfile
+	// Plain simple SELECT to get user info on users table
+	err := db.c.Query(`SELECT * FROM users WHERE username=?`, username).Scan(
+		&up.Username, &up.User)
 	if err == sql.ErrNoRows {
-		return nil, ErrPhotoDoesNotExist
+		return nil, ErrUserDoesNotExist
 	}	
 	if err != nil {
 		return nil, err
 	}
 	
-	// Plain simple SELECT to get photo info on comments table
-	err := db.c.Query(`SELECT count(*) FROM comments WHERE photoId=?`, photoId).Scan(&p.nComments)
+	// Plain simple SELECT to get user info on photos table
+	err := db.c.Query(`SELECT count(*) FROM photos WHERE username=?`, username).Scan(&up.NPosts)
+	if err != nil {
+		return nil, err
+	}
+	// Plain simple SELECT to get user info on comments table
+	err := db.c.Query(`SELECT count(*) FROM comments WHERE username=?`, username).Scan(&up.NComments)
 	if err != nil {
 		return nil, err
 	}
 	// Plain simple SELECT to get photo info on likes table
-	err := db.c.Query(`SELECT count(*) FROM likes WHERE photoId=?`, photoId).Scan(&p.nlikes)
+	err := db.c.Query(`SELECT count(*) FROM likes WHERE username=?`, username).Scan(&up.NLikes)
 	if err != nil {
 		return nil, err
 	}

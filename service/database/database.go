@@ -38,28 +38,28 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	uploadPhoto(username string, caption string) (Photo, error)
-	deletePhoto(photoId int64) error
-	getPhoto(username string, photoId int64) (Photo, error)
-	listUserPhotos(username string) ([]Photo, error)
+	UploadPhoto(username string, caption string) (Photo, error)
+	DeletePhoto(photoId int64) error
+	GetPhoto(username string, photoId int64) (Photo, error)
+	ListUserPhotos(username string) ([]Photo, error)
 
-	commentPhoto(username string, photoId int64, text string) (Comment, error)
-	uncommentPhoto(commentId uint64) error 
-	listComments(photoId int64) ([]Comment, error)
+	CommentPhoto(username string, photoId int64, text string) (Comment, error)
+	UncommentPhoto(commentId uint64) error 
+	ListComments(photoId int64) ([]Comment, error)
 
-	likePhoto(username string, photoId int64) error
-	unlikePhoto(username string, photoId int64) error
-	listLikes(photoId int64) (username []string, error)
+	LikePhoto(username string, photoId int64) error
+	UnlikePhoto(username string, photoId int64) error
+	ListLikes(photoId int64) (username []string, error)
 
-	banUser(authUsername string, bannedUser string) error
-	unbanUser(authUsername string, bannedUser string) error
-	listBans(authUsername string) ([]string, error)
+	BanUser(authUsername string, bannedUser string) error
+	UnbanUser(authUsername string, bannedUser string) error
+	ListBans(authUsername string) ([]string, error)
 
-	followUser(followingUser string, followedUser string) error
-	unfollowUser(followingUser string, followedUser string) error
-	listFollowRelationship(query string, username string) ([]string, error)
-	listFollowing(followingUser string) ([]string, error)
-	listFollowers(followedUser string) ([]string, error)
+	FollowUser(followingUser string, followedUser string) error
+	UnfollowUser(followingUser string, followedUser string) error
+	ListFollowRelationship(query string, username string) ([]string, error)
+	ListFollowing(followingUser string) ([]string, error)
+	ListFollowers(followedUser string) ([]string, error)
 
 	
 	Ping() error

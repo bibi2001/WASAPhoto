@@ -1,7 +1,7 @@
 package database
 import "github.com/bibi2001/WASAPhoto/service/globaltime"
 
-func (db *appdbimpl) uploadPhoto(username string, caption string) (Photo, error) {
+func (db *appdbimpl) UploadPhoto(username string, caption string) (Photo, error) {
 	t := globaltime.Now()
 	res, err := db.c.Exec(`INSERT INTO photos (photoId, username, date, caption) 
 		VALUES (NULL, ?, ?, ?)`, username, t, caption)
@@ -19,7 +19,7 @@ return p, nil
 }
 
 var ErrPhotoDoesNotExist = errors.New("The photo does not exist!")
-func (db *appdbimpl) deletePhoto(photoId int64) error {
+func (db *appdbimpl) DeletePhoto(photoId int64) error {
 	res, err := db.c.Exec(`DELETE FROM photos WHERE photoId=?`, photoId)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func (db *appdbimpl) deletePhoto(photoId int64) error {
 	return nil
 }
 
-func (db *appdbimpl) getPhoto(username string, photoId int64) (Photo, error) {
+func (db *appdbimpl) GetPhoto(username string, photoId int64) (Photo, error) {
 
 	var p Photo 
 	// Plain simple SELECT to get photo info on photos table
@@ -54,7 +54,7 @@ func (db *appdbimpl) getPhoto(username string, photoId int64) (Photo, error) {
 		return nil, err
 	}
 	// Plain simple SELECT to get photo info on likes table
-	err := db.c.Query(`SELECT count(*) FROM likes WHERE photoId=?`, photoId).Scan(&p.Nlikes)
+	err := db.c.Query(`SELECT count(*) FROM likes WHERE photoId=?`, photoId).Scan(&p.NLikes)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (db *appdbimpl) getPhoto(username string, photoId int64) (Photo, error) {
 	return p, nil
 }
 
-func (db *appdbimpl) listUserPhotos(username string) ([]Photo, error) {
+func (db *appdbimpl) ListUserPhotos(username string) ([]Photo, error) {
 	var ret []string
 
 	// Plain simple SELECT

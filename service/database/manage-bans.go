@@ -1,12 +1,12 @@
 package database
 
-func (db *appdbimpl) banUser(authUser string, bannedUser string) error {
+func (db *appdbimpl) BanUser(authUser string, bannedUser string) error {
 	res, err := db.c.Exec(`INSERT INTO bans (authUser, bannedUser) VALUES (?, ?)`,
 		authUser, bannedUser)
 	if err != nil {
 		return err
 	}
-	err := db.unfollowUser(authUser, bannedUser)
+	err := db.UnfollowUser(authUser, bannedUser)
 	if err!= nil && err!=db.ErrFollowDoesNotExist {
 		return err
 	}
@@ -15,7 +15,7 @@ func (db *appdbimpl) banUser(authUser string, bannedUser string) error {
 }
 
 var ErrBanDoesNotExist = errors.New("The user is not banned!")
-func (db *appdbimpl) unbanUser(authUser string, bannedUser string) error {
+func (db *appdbimpl) UnbanUser(authUser string, bannedUser string) error {
 	res, err := db.c.Exec(`DELETE FROM bans WHERE authUser=? AND bannedUser=?`, 
 		authUser, bannedUser)
 	if err != nil {
@@ -32,7 +32,7 @@ func (db *appdbimpl) unbanUser(authUser string, bannedUser string) error {
 	return nil
 }
 
-func (db *appdbimpl) listBans(authUser string) ([]string, error) {
+func (db *appdbimpl) ListBans(authUser string) ([]string, error) {
 	var ret []string
 
 	// Plain simple SELECT

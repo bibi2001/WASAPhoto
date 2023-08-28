@@ -1,6 +1,6 @@
 package database
 
-func (db *appdbimpl) commentPhoto(username string, photoId int64, text string) (Comment, error) {
+func (db *appdbimpl) CommentPhoto(username string, photoId int64, text string) (Comment, error) {
 	res, err := db.c.Exec(`INSERT INTO comments (id, photoId, username, text) VALUES (NULL, ?, ?, ?)`,
 		photoId, username, text)
 	if err != nil {
@@ -17,7 +17,7 @@ func (db *appdbimpl) commentPhoto(username string, photoId int64, text string) (
 }
 
 var ErrCommentDoesNotExist = errors.New("The comment does not exist!")
-func (db *appdbimpl) uncommentPhoto(commentId uint64) error {
+func (db *appdbimpl) UncommentPhoto(commentId uint64) error {
 	res, err := db.c.Exec(`DELETE FROM comments WHERE commentId=?`, commentId)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (db *appdbimpl) uncommentPhoto(commentId uint64) error {
 	return nil
 }
 
-func (db *appdbimpl) listComments(photoId int64) ([]Comment, error) {
+func (db *appdbimpl) ListComments(photoId int64) ([]Comment, error) {
 	var ret []SimpleComment
 
 	// Plain simple SELECT

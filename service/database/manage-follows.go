@@ -1,6 +1,6 @@
 package database
 
-func (db *appdbimpl) followUser(followingUser string, followedUser string) error {
+func (db *appdbimpl) FollowUser(followingUser string, followedUser string) error {
 	res, err := db.c.Exec(`INSERT INTO follows (followingUser, followedUser) VALUES (?, ?)`,
 		followingUser, followedUser)
 	if err != nil {
@@ -11,7 +11,7 @@ func (db *appdbimpl) followUser(followingUser string, followedUser string) error
 }
 
 var ErrFollowDoesNotExist = errors.New("The user is not followed!")
-func (db *appdbimpl) unfollowUser(followingUser string, followedUser string) error {
+func (db *appdbimpl) UnfollowUser(followingUser string, followedUser string) error {
 	res, err := db.c.Exec(`DELETE FROM follows WHERE followingUser=? AND followedUser=?`, 
 		followingUser, followedUser)
 	if err != nil {
@@ -28,7 +28,7 @@ func (db *appdbimpl) unfollowUser(followingUser string, followedUser string) err
 	return nil
 }
 
-func (db *appdbimpl) listFollowRelationship(query string, username string) ([]string, error) {
+func (db *appdbimpl) ListFollowRelationship(query string, username string) ([]string, error) {
 	var ret []string
 
 	// Plain simple SELECT
@@ -55,9 +55,9 @@ func (db *appdbimpl) listFollowRelationship(query string, username string) ([]st
 	return ret, nil
 }
 
-func (db *appdbimpl) listFollowing(followingUser string) ([]string, error) {
-	return listFollowRelationship(`SELECT followedUser FROM follows WHERE followingUser=?`, username)
+func (db *appdbimpl) ListFollowing(followingUser string) ([]string, error) {
+	return ListFollowRelationship(`SELECT followedUser FROM follows WHERE followingUser=?`, username)
 
-func (db *appdbimpl) listFollowers(followedUser string) ([]string, error) {
-	return listFollowRelationship(`SELECT followingUser FROM follows WHERE followedUser=?`, username)
+func (db *appdbimpl) ListFollowers(followedUser string) ([]string, error) {
+	return ListFollowRelationship(`SELECT followingUser FROM follows WHERE followedUser=?`, username)
 	
