@@ -8,7 +8,7 @@ func (db *appdbimpl) GetUserStream(username string) ([]Photo, error) {
 		SELECT photoId 
 		FROM photos AS p, follows AS f
 		WHERE p.username = f.followedUser
-		AND f.followingUser = ?
+		AND f.followingUser=?
 		ORDER BY p.date DESC`, 
 		username)
 	if err != nil {

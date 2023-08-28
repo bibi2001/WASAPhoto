@@ -87,9 +87,14 @@ func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, 
 		SELECT username FROM users  
 		WHERE username LIKE '%' || ? || '%'
 		AND username NOT IN (
-			SELECT bannedUsername FROM bans 
-			WHERE bannedUsername = username AND authUser = ?
-		)`, searchQuery, authUser)
+			SELECT bannedUser FROM bans 
+			WHERE bannedUser = username 
+			AND authUser=? ) 
+		AND username NOT IN (
+			SELECT authUser FROM bans 
+			WHERE authUser = username 
+			AND bannedUser=?
+		)`, searchQuery, authUser, authUser)
 	if err != nil {
 		return nil, err
 	}
