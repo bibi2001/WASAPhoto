@@ -38,7 +38,7 @@ func (db *appdbimpl) GetUserProfile(username string, authUser string) (UserProfi
 	} else if err != nil {
 		return nil, err
 	}
-asd
+
 	// Save number of followers into NFollowers
 	followers, err := db.ListFollowers(username)
     if err != nil {
@@ -73,6 +73,7 @@ asd
 		return nil, err
 	}
 	up.Photos = photos
+	up.NPosts = int64(len(photos))
 
 	return up, nil
 }
