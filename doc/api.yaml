@@ -444,14 +444,11 @@ components:
           type: array
           minItems: 1
           items: 
-            type: object
-            properties:
-              username:
-                type: string
-                example: jonhDoe
-                pattern: 'ˆ.*?$'
-                minLength: 3
-                maxLength: 16
+            type: string
+            example: jonhDoe
+            pattern: 'ˆ.*?$'
+            minLength: 3
+            maxLength: 16
           
     UserProfile:
       type: object

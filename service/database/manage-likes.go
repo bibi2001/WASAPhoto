@@ -40,7 +40,7 @@ func (db *appdbimpl) listLikes(photoId int64) ([]string, error) {
 	// Here we read the resultset and we build the list to be returned
 	for rows.Next() {
 		var l string
-		err = rows.Scan(&l.username)
+		err = rows.Scan(&l)
 		if err != nil {
 			return nil, err
 		}

@@ -1,0 +1,28 @@
+package structs
+
+type Comment struct {
+	CommentID int64  `json:"commentId"`
+	PhotoID   int64  `json:"photoId"`
+	Username  string `json:"username"`
+	Text      string `json:"text"`
+}
+
+type Photo struct {
+	PhotoID   int64  `json:"photoId"`
+	Username  string `json:"username"`
+	Date      string `json:"date"`
+	Caption   string `json:"caption"`
+	NComments int64  `json:"nComments"`
+	NLikes    int64  `json:"nLikes"`
+	IsLiked   bool   `json:"isLiked"`
+}
+
+type UserProfile struct {
+	Username   string  `json:"username"`
+	Name       string  `json:"name"`
+	NPosts     int64   `json:"nPosts"`
+	NFollowers int64   `json:"nFollowers"`
+	NFollowing int64   `json:"nFollowing"`
+	IsFollowed bool    `json:"isFollowed"`
+	Photos     []Photo `json:"photos"`
+}

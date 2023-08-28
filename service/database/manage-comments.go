@@ -47,7 +47,7 @@ func (db *appdbimpl) listComments(photoId int64) ([]Comment, error) {
 	// Here we read the resultset and we build the list to be returned
 	for rows.Next() {
 		var c Comment
-		err = rows.Scan(&c.commentId, &c.photoId, &c.username, &c.text)
+		err = rows.Scan(&c.CommentId, &c.PhotoId, &c.Username, &c.Text)
 		if err != nil {
 			return nil, err
 		}

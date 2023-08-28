@@ -14,7 +14,7 @@ if err != nil {
 	return nil, err
 }
 
-p := Photo{uint64(lastInsertID), username, t, caption, 0, 0, false}
+p := Photo{int64(lastInsertID), username, t, caption, 0, 0, false}
 return p, nil
 }
 
@@ -40,7 +40,7 @@ func (db *appdbimpl) getPhoto(username string, photoId int64) (Photo, error) {
 	var p Photo 
 	// Plain simple SELECT to get photo info on photos table
 	err := db.c.Query(`SELECT * FROM photos WHERE photoId=?`, photoId).Scan(
-		&p.photoId, &p.username, &p.date, &p.caption)
+		&p.PhotoId, &p.Username, &p.Date, &p.Caption)
 	if err == sql.ErrNoRows {
 		return nil, ErrPhotoDoesNotExist
 	}	
@@ -49,19 +49,19 @@ func (db *appdbimpl) getPhoto(username string, photoId int64) (Photo, error) {
 	}
 	
 	// Plain simple SELECT to get photo info on comments table
-	err := db.c.Query(`SELECT count(*) FROM comments WHERE photoId=?`, photoId).Scan(&p.nComments)
+	err := db.c.Query(`SELECT count(*) FROM comments WHERE photoId=?`, photoId).Scan(&p.NComments)
 	if err != nil {
 		return nil, err
 	}
 	// Plain simple SELECT to get photo info on likes table
-	err := db.c.Query(`SELECT count(*) FROM likes WHERE photoId=?`, photoId).Scan(&p.nlikes)
+	err := db.c.Query(`SELECT count(*) FROM likes WHERE photoId=?`, photoId).Scan(&p.Nlikes)
 	if err != nil {
 		return nil, err
 	}
 	// Plain simple SELECT to get photo and user relation info on likes table
 	err:= db.c.Query(`SELECT EXISTS (
 		SELECT 1 FROM likes WHERE photoId = 0 AND username = 'jonhDoe'
-		)`, photoId, username).Scan(&p.isLiked)
+		)`, photoId, username).Scan(&p.IsLiked)
 	if err != nil {
 		return nil, err
 	}

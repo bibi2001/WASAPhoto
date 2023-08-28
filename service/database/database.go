@@ -36,23 +36,6 @@ import (
 	"fmt"
 )
 
-type Comment struct {
-	commentId int64
-	photoId   int64
-	username  string
-	text      string
-}
-
-type Photo struct {
-	photoId   int64
-	username  string
-	date      string
-	caption   string
-	nComments int64
-	nLikes    int64
-	isLiked   bool
-}
-
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	uploadPhoto(username string, caption string) (Photo, error)
