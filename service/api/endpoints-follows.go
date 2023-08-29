@@ -15,11 +15,6 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		// The body was not a parseable JSON, reject it
 		w.WriteHeader(http.StatusBadRequest)
 		return
-	} else if !Validate(username) {
-		// Here we validated the username format, and we
-		// discovered that it is not valid.
-		w.WriteHeader(http.StatusBadRequest)
-		return
 	}
 
 	// Create the fountain in the database. Note that this function will return a new instance of the fountain with the
