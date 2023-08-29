@@ -1,10 +1,18 @@
+import (
+	"github.com/julienschmidt/httprouter"
+	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
+	"net/http"
+	"encoding/json"
+	"net/http"
+)
+
 func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Parse the JSON request body to get the username.
+	// Parsing the JSON request body to get the username
 	var requestBody struct {
 		Name string `json:"name"`
 	}
@@ -26,6 +34,6 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK) // Use http.StatusOK for success
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(responseData)
 }
