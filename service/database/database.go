@@ -99,9 +99,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "users" (
-			"username"	TEXT NOT NULL,
-			"name"	TEXT,
-			PRIMARY KEY("username")
+			"userId"	TEXT NOT NULL,
+			"username"	TEXT NOT NULL UNIQUE,
+			PRIMARY KEY("userId")
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {

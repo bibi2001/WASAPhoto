@@ -1,8 +1,8 @@
 package database
 
-func (db *appdbimpl) CreateUser(username string, name string) error {
-	res, err := db.c.Exec(`INSERT INTO users (username, name) VALUES (?, ?)`,
-		username, name)
+func (db *appdbimpl) CreateUser(userId string, username string) error {
+	res, err := db.c.Exec(`INSERT INTO users (userId, username) VALUES (?, ?)`,
+		userId, username)
 	// Check if username is unique 
 	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 		return errors.New("Username given is not original enough.")
@@ -13,9 +13,9 @@ func (db *appdbimpl) CreateUser(username string, name string) error {
 	return nil
 }
 
-func (db *appdbimpl) UpdateUsername(oldUsername string, newUsername string) error {
-	res, err := db.c.Exec(`UPDATE users SET username=? WHERE username=?`,
-		newUsername, oldUsername)
+func (db *appdbimpl) UpdateUsername(userId string, newUsername string) error {
+	res, err := db.c.Exec(`UPDATE users SET username=? WHERE userId=?`,
+		username, userId)
 	// Check if username is unique 
 	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 		return errors.New("Username given is not original enough.")
@@ -47,28 +47,28 @@ func (db *appdbimpl) GetUserProfile(username string, authUser string) (UserProfi
     up.NFollowers = int64(len(followers))
 
 	// Save number of following into NFollowing
-	following, err := db.ListFollowing(username)
+	following, err := ListFollowing(username)
 	if err != nil {
 		return nil, err
 	}
 	up.NFollowing = int64(len(following))
 
 	// Save if user is followed into isFollowed
-	isFollowed, err := db.IsFollowed(authUser, username)
+	isFollowed, err := IsFollowed(authUser, username)
 	if err != nil {
 		return nil, err
 	}
 	up.IsFollowed = bool(isFollowed)
 
 	// Save if user is banned into isBanned
-	isBanned, err := db.IsBanned(authUser, username)
+	isBanned, err := IsBanned(authUser, username)
 	if err != nil {
 		return nil, err
 	}
 	up.IsBanned = bool(isBanned)
 
 	// Save user photos into photos
-	photos, err := db.ListUserPhotos(username)
+	photos, err := ListUserPhotos(username)
 	if err != nil {
 		return nil, err
 	}
@@ -115,4 +115,19 @@ func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, 
 	}
 
 	return ret, nil
+}
+
+func (db *appdbimpl) IsPhotoOwner(username string, photoId int64) (bool, error) {
+    var isPhotoOwner bool
+
+	// Plain simple SELECT
+    err := db.c.QueryRow(`SELECT EXISTS (
+        SELECT 1 FROM bans WHERE username=? AND photoId = ?
+    )`, username, photoId).Scan(&isPhotoOwner)
+
+    if err != nil {
+        return false, err
+    }
+
+    return isPhotoOwner, nil
 }
