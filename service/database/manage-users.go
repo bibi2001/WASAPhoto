@@ -1,8 +1,8 @@
 package database
 
-func (db *appdbimpl) CreateUser(userId string, username string) error {
+func (db *appdbimpl) CreateUser(username string) error {
 	res, err := db.c.Exec(`INSERT INTO users (userId, username) VALUES (?, ?)`,
-		userId, username)
+		NULL, username)
 	// Check if username is unique 
 	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 		return errors.New("Username given is not original enough.")
@@ -13,7 +13,7 @@ func (db *appdbimpl) CreateUser(userId string, username string) error {
 	return nil
 }
 
-func (db *appdbimpl) UpdateUsername(userId string, newUsername string) error {
+func (db *appdbimpl) UpdateUsername(userId int64, newUsername string) error {
 	res, err := db.c.Exec(`UPDATE users SET username=? WHERE userId=?`,
 		username, userId)
 	// Check if username is unique 
@@ -117,17 +117,29 @@ func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, 
 	return ret, nil
 }
 
-func (db *appdbimpl) IsPhotoOwner(username string, photoId int64) (bool, error) {
-    var isPhotoOwner bool
+func GetUserID(username string) (int64, error) {
+    var exists bool
 
-	// Plain simple SELECT
+    // Plain simple SELECT to check if the user exists
     err := db.c.QueryRow(`SELECT EXISTS (
-        SELECT 1 FROM bans WHERE username=? AND photoId = ?
-    )`, username, photoId).Scan(&isPhotoOwner)
-
+        SELECT 1 FROM users WHERE username=?
+    )`, username).Scan(&exists)
     if err != nil {
-        return false, err
+        return 0, err 
     }
 
-    return isPhotoOwner, nil
+    if !exists {
+        // Attempt to create the user
+        if err := CreateUser(username); err != nil {
+            return 0, err 
+        }
+    }
+
+    var userID int64
+    err = db.c.QueryRow(`SELECT userId FROM users WHERE username=?`, username).Scan(&userID)
+    if err != nil {
+        return 0, err 
+    }
+
+    return userID, nil 
 }

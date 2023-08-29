@@ -117,3 +117,18 @@ func (db *appdbimpl) IsPhotoOwner(username string, photoId int64) (bool, error) 
     return isPhotoOwner, nil
 }
 
+
+func (db *appdbimpl) IsPhotoOwner(username string, photoId int64) (bool, error) {
+    var isPhotoOwner bool
+
+	// Plain simple SELECT
+    err := db.c.QueryRow(`SELECT EXISTS (
+        SELECT 1 FROM bans WHERE username=? AND photoId = ?
+    )`, username, photoId).Scan(&isPhotoOwner)
+
+    if err != nil {
+        return false, err
+    }
+
+    return isPhotoOwner, nil
+}

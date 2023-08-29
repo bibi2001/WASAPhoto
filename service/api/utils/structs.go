@@ -33,3 +33,6 @@ type UserProfile struct {
 	Photos     []Photo `json:"photos"`
 }
 
+type LoginResponse struct {
+	Identifier string `json:"identifier"`
+}

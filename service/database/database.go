@@ -71,6 +71,7 @@ type AppDatabase interface {
 	UpdateUsername(oldUsername string, newUsername string) error
 	GetUserProfile(username string, authUser string) (UserProfile, error)
 	UserSearch(searchQuery string, authUser string) ([]string, error)
+	GetUserID(username string) (int64, error) 
 
 	Ping() error
 }
@@ -99,9 +100,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "users" (
-			"userId"	TEXT NOT NULL,
+			"userId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			"username"	TEXT NOT NULL UNIQUE,
-			PRIMARY KEY("userId")
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
