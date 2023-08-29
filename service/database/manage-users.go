@@ -117,29 +117,38 @@ func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, 
 	return ret, nil
 }
 
-func GetUserID(username string) (int64, error) {
-    var exists bool
+func UserExists(username string) (bool, error) {
+	var exists bool
 
-    // Plain simple SELECT to check if the user exists
-    err := db.c.QueryRow(`SELECT EXISTS (
-        SELECT 1 FROM users WHERE username=?
-    )`, username).Scan(&exists)
-    if err != nil {
-        return 0, err 
-    }
+	err := db.c.QueryRow(`SELECT EXISTS (
+		SELECT 1 FROM users WHERE username=?
+	)`, username).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
 
-    if !exists {
-        // Attempt to create the user
-        if err := CreateUser(username); err != nil {
-            return 0, err 
-        }
-    }
-
-    var userID int64
-    err = db.c.QueryRow(`SELECT userId FROM users WHERE username=?`, username).Scan(&userID)
-    if err != nil {
-        return 0, err 
-    }
-
-    return userID, nil 
+	return exists, nil
 }
+
+func GetUserID(username string) (int64, error) {
+	userExists, err := UserExists(username)
+	if err != nil {
+		return 0, err
+	}
+
+	if !userExists {
+		// Attempt to create the user
+		if err := CreateUser(username); err != nil {
+			return 0, err
+		}
+	}
+
+	var userId int64
+	err = db.c.QueryRow(`SELECT userId FROM users WHERE username=?`, username).Scan(&userId)
+	if err != nil {
+		return 0, err
+	}
+
+	return userId, nil
+}
+
