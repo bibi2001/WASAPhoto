@@ -15,17 +15,16 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		// The body was not a parseable JSON, reject it
 		w.WriteHeader(http.StatusBadRequest)
 		return
-	} else if !fountain.IsValid() {
-		// Here we validated the fountain structure content (e.g., location coordinates in correct range, etc.), and we
-		// discovered that the fountain data are not valid.
-		// Note: the IsValid() function skips the ID check (see below).
+	} else if !Validate(username) {
+		// Here we validated the username format, and we
+		// discovered that it is not valid.
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Create the fountain in the database. Note that this function will return a new instance of the fountain with the
 	// same information, plus the ID.
-	dbfountain, err := rt.db.CreateFountain(fountain.ToDatabase())
+	dbfountain, err := rt.db.FollowUser(, username)
 	if err != nil {
 		// In this case, we have an error on our side. Log the error (so we can be notified) and send a 500 to the user
 		// Note: we are using the "logger" inside the "ctx" (context) because the scope of this issue is the request.

@@ -1,4 +1,9 @@
-package structs
+/*
+The structs.go contains the useful structs that are used on the rest of the service directory,
+more specifically in the database and api subdirectories.
+*/
+
+package utils
 
 type Comment struct {
 	CommentID int64  `json:"commentId"`
@@ -27,3 +32,4 @@ type UserProfile struct {
 	IsBanned   bool    `json:"isbanned"`
 	Photos     []Photo `json:"photos"`
 }
+
