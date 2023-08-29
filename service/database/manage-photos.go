@@ -101,7 +101,6 @@ func (db *appdbimpl) ListUserPhotos(username string) ([]Photo, error) {
 	return ret, nil
 }
 
-
 func (db *appdbimpl) IsPhotoOwner(username string, photoId int64) (bool, error) {
     var isPhotoOwner bool
 

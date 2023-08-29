@@ -63,9 +63,10 @@ type AppDatabase interface {
 	DeletePhoto(photoId int64) error
 	GetPhoto(username string, photoId int64) (Photo, error)
 	ListUserPhotos(username string) ([]Photo, error)
-
-	GetUserStream(username string) ([]Photo, error)
+	IsPhotoOwner(username string, photoId int64) (bool, error)
 	
+	GetUserStream(username string) ([]Photo, error)
+
 	CreateUser(username string, name string) error
 	UpdateUsername(oldUsername string, newUsername string) error
 	GetUserProfile(username string, authUser string) (UserProfile, error)
