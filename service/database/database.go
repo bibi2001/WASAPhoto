@@ -58,13 +58,15 @@ type AppDatabase interface {
 	LikePhoto(username string, photoId int64) error
 	UnlikePhoto(username string, photoId int64) error
 	ListLikes(photoId int64) (username []string, error)
-
+	IsLiked(userId string, photoId int64) (bool, error)
+	
 	UploadPhoato(username string, caption string) (Photo, error)
 	DeletePhoto(photoId int64) error
 	GetPhoto(username string, photoId int64) (Photo, error)
 	ListUserPhotos(username string) ([]Photo, error)
 	IsPhotoOwner(username string, photoId int64) (bool, error)
-	
+	PhotoExists(photoId int64) (bool, error)
+
 	GetUserStream(username string) ([]Photo, error)
 
 	CreateUser(username string, name string) error
