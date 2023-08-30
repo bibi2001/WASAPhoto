@@ -65,3 +65,18 @@ func (db *appdbimpl) ListFollowing(followingUser string) ([]string, error) {
 func (db *appdbimpl) ListFollowers(followedUser string) ([]string, error) {
 	return db.ListFollowRelationship(`SELECT followingUser FROM follows WHERE followedUser=?`, followedUser)
 }
+
+func (db *appdbimpl) IsFollowed(followingUser string, followedUser string) (bool, error) {
+	var isFollowed bool
+
+	// Plain simple SELECT
+	err := db.c.QueryRow(`SELECT EXISTS (
+        SELECT 1 FROM follows WHERE followingUser=? AND followedUser = ?
+    )`, followingUser, followedUser).Scan(&isFollowed)
+
+	if err != nil {
+		return false, err
+	}
+
+	return isFollowed, nil
+}

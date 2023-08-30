@@ -238,13 +238,10 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                image:
-                  type: string
-                  format: binary
-                  minLength: 1
-                  maxLength: 32505856 
+              type: string
+              format: binary
+              minLength: 1
+              maxLength: 32505856 
         required: true
       responses:
         '201':

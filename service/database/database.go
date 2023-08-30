@@ -58,7 +58,7 @@ type AppDatabase interface {
 	UnlikePhoto(username string, photoId int64) error
 	ListLikes(photoId int64) ([]string, error)
 
-	UploadPhoato(username string, caption string) (Photo, error)
+	UploadPhoto(username string, caption string) (Photo, error)
 	DeletePhoto(photoId int64) error
 	GetPhoto(username string, photoId int64) (Photo, error)
 	ListUserPhotos(username string) ([]Photo, error)
@@ -67,8 +67,8 @@ type AppDatabase interface {
 
 	GetUserStream(username string) ([]Photo, error)
 
-	CreateUser(username string, name string) error
-	UpdateUsername(oldUsername string, newUsername string) error
+	CreateUser(username string) error
+	UpdateUsername(userId int64, newUsername string) error
 	GetUserProfile(username string, authUser string) (UserProfile, error)
 	UserSearch(searchQuery string, authUser string) ([]string, error)
 	UserExists(username string) (bool, error)
@@ -115,6 +115,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "photos" (
 			"photoId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			"image" TEXT NOT NULL,
 			"username"	TEXT NOT NULL,
 			"date"	TEXT NOT NULL,
 			"caption"	TEXT,
