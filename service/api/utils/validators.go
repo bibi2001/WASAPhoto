@@ -8,7 +8,12 @@ import (
 	"regexp"
 )
 
-func Validate(username string) bool {
+func ValidateCaption(caption string) bool {
+	// Caption can have a maximum of 90 characters
+	return len(caption) < 91
+}
+
+func ValidateUsername(username string) bool {
 	// Username can contain any numbers, letters and  also underscores
 	// The length should be between 3 and 16 characters.
 	pattern := `^[a-zA-Z0-9_][a-zA-Z0-9_]{2,16}$`
