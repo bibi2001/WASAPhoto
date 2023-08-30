@@ -7,7 +7,7 @@ import (
     "net/http"
 )
 
-func (rt *_router) changeFollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) FollowsEndpoints(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
     // Read the username to be followed from the request body.
     var userToFollow string
     err := json.NewDecoder(r.Body).Decode(&userToFollow)
@@ -46,15 +46,8 @@ func (rt *_router) changeFollowUser(w http.ResponseWriter, r *http.Request, ps h
         return
     }
 
-	// Check if Authenticated user is following user given
-	isFollowing, err := rt.db.IsFollowing(authUser, userToFollow)
-	if err != nil {
-        ctx.Logger.WithError(err).Error("can't check following status")
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
-
-	if isFollowing {
+    // Check if we should follow or unfollow the user
+	if r.Method == http.MethodPost {
 		// Follow user
 		err = rt.db.FollowUser(authUser, userToFollow)
     	if err != nil {
@@ -63,7 +56,7 @@ func (rt *_router) changeFollowUser(w http.ResponseWriter, r *http.Request, ps h
 			return
     	}
 		w.WriteHeader(http.StatusCreated)
-	} else {
+	} else if r.Method == http.MethodDelete {
 		// Unfollow user
 		err = rt.db.UnfollowUser(authUser, userToFollow)
     	if err != nil {

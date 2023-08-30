@@ -7,7 +7,7 @@ import (
     "net/http"
 )
 
-func (rt *_router) likeUnlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) LikesEndpoints(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
     // Read the username to be followed from the request body.
     var photoId string
     err := json.NewDecoder(r.Body).Decode(&photoId)
@@ -46,24 +46,19 @@ func (rt *_router) likeUnlikePhoto(w http.ResponseWriter, r *http.Request, ps ht
         return
     }
 
-	// Check if Authenticated user has liked the photo given
-	isLiked, err := rt.db.IsLiked(authUser, photoId)
-	if err != nil {
-        ctx.Logger.WithError(err).Error("can't check like status")
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
-
-	if isLiked {
-		err = rt.db.FollowUser(authUser, photoId)
+	// Check if we should like or unlike the photo
+	if r.Method == http.MethodPost {
+        // Like the photo
+		err = rt.db.LikePhoto(authUser, photoId)
     	if err != nil {
         	ctx.Logger.WithError(err).Error("can't like photo")
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
     	}
 		w.WriteHeader(http.StatusCreated)
-	} else {
-		err = rt.db.UnfollowUser(authUser, photoId)
+	} else if r.Method == http.MethodDelete {
+        // Unlike the photo
+		err = rt.db.UnlikePhoto(authUser, photoId)
     	if err != nil {
         	ctx.Logger.WithError(err).Error("can't unlike photo")
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
