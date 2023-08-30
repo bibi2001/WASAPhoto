@@ -177,14 +177,6 @@ paths:
         The authenticated user will unfollow the user with the given username.
         A user can't unfollow themselves
       operationId: unfollowUser
-      parameters:
-        - $ref: "#/components/parameters/username"
-        - name: followUsername
-          in: path
-          schema:
-            type: string
-          description: The username of the user to follow
-          required: true
       responses:
         '204': 
           description: Sucessfully unfollowed user
@@ -204,7 +196,7 @@ paths:
           type: string
         description: The username of the user to ban or unban
         required: true
-    post:
+    put:
       tags: ["bans"]
       summary: Ban a user
       description: Ban the user with the username given, a user can't ban themselves
