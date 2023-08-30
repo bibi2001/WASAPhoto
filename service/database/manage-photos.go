@@ -118,17 +118,15 @@ func (db *appdbimpl) IsPhotoOwner(username string, photoId int64) (bool, error) 
 }
 
 
-func (db *appdbimpl) IsPhotoOwner(username string, photoId int64) (bool, error) {
-    var isPhotoOwner bool
+func (db *appdbimpl) PhotoExists(photoId int64) (bool, error) {
+	var exists bool
 
-	// Plain simple SELECT
-    err := db.c.QueryRow(`SELECT EXISTS (
-        SELECT 1 FROM bans WHERE username=? AND photoId = ?
-    )`, username, photoId).Scan(&isPhotoOwner)
+	err := db.c.QueryRow(`SELECT EXISTS (
+		SELECT 1 FROM photos WHERE photoId=?
+	)`, photoId).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
 
-    if err != nil {
-        return false, err
-    }
-
-    return isPhotoOwner, nil
+	return exists, nil
 }
