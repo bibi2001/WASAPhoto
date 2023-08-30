@@ -53,17 +53,3 @@ func (db *appdbimpl) ListLikes(photoId int64) ([]string, error) {
 
 	return ret, nil
 }
-
-
-func (db *appdbimpl) IsLiked(userId string, photoId int64) (bool, error) {
-	var isLiked bool
-	// Plain simple SELECT to check if user likes photo
-	err:= db.c.Query(`SELECT EXISTS (
-		SELECT 1 FROM likes WHERE photoId = ? AND username = ?
-		)`, photoId, username).Scan(&isLiked)
-	if err != nil {
-		return false, err
-	}
-
-	return isLiked
-}
