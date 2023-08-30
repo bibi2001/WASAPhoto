@@ -1,17 +1,19 @@
 package database
 
+import "errors"
+
 func (db *appdbimpl) BanUser(authUser string, bannedUser string) error {
-	res, err := db.c.Exec(`INSERT INTO bans (authUser, bannedUser) VALUES (?, ?)`,
+	_, err := db.c.Exec(`INSERT INTO bans (authUser, bannedUser) VALUES (?, ?)`,
 		authUser, bannedUser)
 	if err != nil {
 		return err
 	}
-	err := db.UnfollowUser(authUser, bannedUser)
-	if err!= nil && err!=db.ErrFollowDoesNotExist {
+	err = db.UnfollowUser(authUser, bannedUser)
+	if err != nil && err != db.ErrFollowDoesNotExist {
 		return err
 	}
-	err := db.UnfollowUser(bannedUser, authUser)
-	if err!= nil && err!=db.ErrFollowDoesNotExist {
+	err = db.UnfollowUser(bannedUser, authUser)
+	if err != nil && err != db.ErrFollowDoesNotExist {
 		return err
 	}
 
@@ -19,8 +21,9 @@ func (db *appdbimpl) BanUser(authUser string, bannedUser string) error {
 }
 
 var ErrBanDoesNotExist = errors.New("The user is not banned!")
+
 func (db *appdbimpl) UnbanUser(authUser string, bannedUser string) error {
-	res, err := db.c.Exec(`DELETE FROM bans WHERE authUser=? AND bannedUser=?`, 
+	res, err := db.c.Exec(`DELETE FROM bans WHERE authUser=? AND bannedUser=?`,
 		authUser, bannedUser)
 	if err != nil {
 		return err
@@ -40,7 +43,7 @@ func (db *appdbimpl) ListBans(authUser string) ([]string, error) {
 	var ret []string
 
 	// Plain simple SELECT
-	rows, err := db.c.Query(`SELECT bannedUser FROM bans WHERE authUser=?`, 
+	rows, err := db.c.Query(`SELECT bannedUser FROM bans WHERE authUser=?`,
 		authUser)
 	if err != nil {
 		return nil, err
@@ -65,16 +68,16 @@ func (db *appdbimpl) ListBans(authUser string) ([]string, error) {
 }
 
 func (db *appdbimpl) IsBanned(authUser string, bannedUser string) (bool, error) {
-    var isBanned bool
+	var isBanned bool
 
 	// Plain simple SELECT
-    err := db.c.QueryRow(`SELECT EXISTS (
+	err := db.c.QueryRow(`SELECT EXISTS (
         SELECT 1 FROM bans WHERE authUser=? AND bannedUser = ?
     )`, authUser, bannedUser).Scan(&isBanned)
 
-    if err != nil {
-        return false, err
-    }
+	if err != nil {
+		return false, err
+	}
 
-    return isBanned, nil
+	return isBanned, nil
 }

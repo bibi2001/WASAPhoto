@@ -4,24 +4,23 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/bibi2001/WASAPhoto/service/api/utils"
 	"github.com/bibi2001/WASAPhoto/service/globaltime"
 )
 
-func (db *appdbimpl) UploadPhoto(username string, caption string) (utils.Photo, error) {
+func (db *appdbimpl) UploadPhoto(username string, caption string) (Photo, error) {
 	t := globaltime.Now()
 	res, err := db.c.Exec(`INSERT INTO photos (photoId, username, date, caption) 
 		VALUES (NULL, ?, ?, ?)`, username, t, caption)
 	if err != nil {
-		return utils.Photo{}, err
+		return Photo{}, err
 	}
 
 	lastInsertID, err := res.LastInsertId()
 	if err != nil {
-		return utils.Photo{}, err
+		return Photo{}, err
 	}
 
-	p := utils.Photo{PhotoId: int64(lastInsertID), Username: username, Date: t, Caption: caption, NComments: 0, NLikes: 0, IsLiked: false}
+	p := Photo{PhotoId: int64(lastInsertID), Username: username, Date: t, Caption: caption, NComments: 0, NLikes: 0, IsLiked: false}
 	return p, nil
 }
 
@@ -43,42 +42,42 @@ func (db *appdbimpl) DeletePhoto(photoId int64) error {
 	return nil
 }
 
-func (db *appdbimpl) GetPhoto(username string, photoId int64) (utils.Photo, error) {
-	var p utils.Photo
+func (db *appdbimpl) GetPhoto(username string, photoId int64) (Photo, error) {
+	var p Photo
 	// Plain simple SELECT to get photo info on photos table
 	err := db.c.QueryRow(`SELECT photoId, username, date, caption 
 		FROM photos WHERE photoId=?`, photoId).Scan(
 		&p.PhotoId, &p.Username, &p.Date, &p.Caption)
 	if err == sql.ErrNoRows {
-		return utils.Photo{}, ErrPhotoDoesNotExist
+		return Photo{}, ErrPhotoDoesNotExist
 	}
 	if err != nil {
-		return utils.Photo{}, err
+		return Photo{}, err
 	}
 
 	// Plain simple SELECT to get photo info on comments table
 	err = db.c.QueryRow(`SELECT count(*) FROM comments WHERE photoId=?`, photoId).Scan(&p.NComments)
 	if err != nil {
-		return utils.Photo{}, err
+		return Photo{}, err
 	}
 	// Plain simple SELECT to get photo info on likes table
 	err = db.c.QueryRow(`SELECT count(*) FROM likes WHERE photoId=?`, photoId).Scan(&p.NLikes)
 	if err != nil {
-		return utils.Photo{}, err
+		return Photo{}, err
 	}
 	// Plain simple SELECT to get photo and user relation info on likes table
 	err = db.c.QueryRow(`SELECT EXISTS (
 		SELECT 1 FROM likes WHERE photoId = ? AND username = ?
 		)`, photoId, username).Scan(&p.IsLiked)
 	if err != nil {
-		return utils.Photo{}, err
+		return Photo{}, err
 	}
 
 	return p, nil
 }
 
-func (db *appdbimpl) ListUserPhotos(username string) ([]utils.Photo, error) {
-	var ret []utils.Photo
+func (db *appdbimpl) ListUserPhotos(username string) ([]Photo, error) {
+	var ret []Photo
 
 	// Plain simple SELECT
 	rows, err := db.c.Query(`SELECT photoId FROM photos WHERE username=?`,

@@ -1,7 +1,9 @@
 package database
 
+import "errors"
+
 func (db *appdbimpl) FollowUser(followingUser string, followedUser string) error {
-	res, err := db.c.Exec(`INSERT INTO follows (followingUser, followedUser) VALUES (?, ?)`,
+	_, err := db.c.Exec(`INSERT INTO follows (followingUser, followedUser) VALUES (?, ?)`,
 		followingUser, followedUser)
 	if err != nil {
 		return err
@@ -11,8 +13,9 @@ func (db *appdbimpl) FollowUser(followingUser string, followedUser string) error
 }
 
 var ErrFollowDoesNotExist = errors.New("The user is not followed!")
+
 func (db *appdbimpl) UnfollowUser(followingUser string, followedUser string) error {
-	res, err := db.c.Exec(`DELETE FROM follows WHERE followingUser=? AND followedUser=?`, 
+	res, err := db.c.Exec(`DELETE FROM follows WHERE followingUser=? AND followedUser=?`,
 		followingUser, followedUser)
 	if err != nil {
 		return err
@@ -56,8 +59,9 @@ func (db *appdbimpl) ListFollowRelationship(query string, username string) ([]st
 }
 
 func (db *appdbimpl) ListFollowing(followingUser string) ([]string, error) {
-	return ListFollowRelationship(`SELECT followedUser FROM follows WHERE followingUser=?`, username)
+	return db.ListFollowRelationship(`SELECT followedUser FROM follows WHERE followingUser=?`, followingUser)
+}
 
 func (db *appdbimpl) ListFollowers(followedUser string) ([]string, error) {
-	return ListFollowRelationship(`SELECT followingUser FROM follows WHERE followedUser=?`, username)
+	return db.ListFollowRelationship(`SELECT followingUser FROM follows WHERE followedUser=?`, followedUser)
 }

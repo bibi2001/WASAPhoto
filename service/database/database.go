@@ -38,14 +38,13 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	
 	BanUser(authUsername string, bannedUser string) error
 	UnbanUser(authUsername string, bannedUser string) error
 	ListBans(authUsername string) ([]string, error)
 	IsBanned(authUser string, bannedUser string) (bool, error)
 
 	CommentPhoto(username string, photoId int64, text string) (Comment, error)
-	UncommentPhoto(commentId uint64) error 
+	UncommentPhoto(commentId uint64) error
 	ListComments(photoId int64) ([]Comment, error)
 
 	FollowUser(followingUser string, followedUser string) error
@@ -57,8 +56,8 @@ type AppDatabase interface {
 
 	LikePhoto(username string, photoId int64) error
 	UnlikePhoto(username string, photoId int64) error
-	ListLikes(photoId int64) (username []string, error)
-	
+	ListLikes(photoId int64) ([]string, error)
+
 	UploadPhoato(username string, caption string) (Photo, error)
 	DeletePhoto(photoId int64) error
 	GetPhoto(username string, photoId int64) (Photo, error)
@@ -73,7 +72,7 @@ type AppDatabase interface {
 	GetUserProfile(username string, authUser string) (UserProfile, error)
 	UserSearch(searchQuery string, authUser string) ([]string, error)
 	UserExists(username string) (bool, error)
-	GetUserId(username string) (int64, error) 
+	GetUserId(username string) (int64, error)
 	GetUsername(userId int64) (string, error)
 
 	Ping() error
@@ -91,16 +90,16 @@ func New(db *sql.DB) (AppDatabase, error) {
 	}
 
 	// Enable foreign keys
-	stmt = "PRAGMA foreign_keys = ON"
-	_, err = db.Exec(sqlStmt)
+	sqlStmt := "PRAGMA foreign_keys = ON"
+	_, err := db.Exec(sqlStmt)
 	if err != nil {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
-	
+
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
 
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "users" (
 			"userId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -111,8 +110,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
 		}
 	}
-	
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='photos';`).Scan(&tableName)
+
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='photos';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "photos" (
 			"photoId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -129,7 +128,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='comments';`).Scan(&tableName)
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='comments';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "comments" (
 			"commentId"	INTEGER NOT NULL AUTOINCREMENT,
@@ -151,7 +150,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='likes';`).Scan(&tableName)
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='likes';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "likes" (
 			"username"	TEXT NOT NULL,
@@ -171,7 +170,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='follows';`).Scan(&tableName)
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='follows';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "follows" (
 			"followingUser"	TEXT NOT NULL,
@@ -191,7 +190,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='bans';`).Scan(&tableName)
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='bans';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "bans" (
 			"authUser"	TEXT NOT NULL,

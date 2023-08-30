@@ -9,7 +9,7 @@ func (db *appdbimpl) GetUserStream(username string) ([]Photo, error) {
 		FROM photos AS p, follows AS f
 		WHERE p.username = f.followedUser
 		AND f.followingUser=?
-		ORDER BY p.date DESC`, 
+		ORDER BY p.date DESC`,
 		username)
 	if err != nil {
 		return nil, err
@@ -23,13 +23,13 @@ func (db *appdbimpl) GetUserStream(username string) ([]Photo, error) {
 		if err != nil {
 			return nil, err
 		}
-		p, err := getPhoto(username, id)
+		p, err := db.GetPhoto(username, id)
 		if err != nil {
 			return nil, err
 		}
 		ret = append(ret, p)
 	}
-	
+
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}

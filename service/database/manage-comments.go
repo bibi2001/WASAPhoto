@@ -1,5 +1,9 @@
 package database
 
+import (
+	"errors"
+)
+
 func (db *appdbimpl) CommentPhoto(username string, photoId int64, text string) (Comment, error) {
 	res, err := db.c.Exec(`INSERT INTO comments (id, photoId, username, text) VALUES (NULL, ?, ?, ?)`,
 		photoId, username, text)
@@ -12,11 +16,12 @@ func (db *appdbimpl) CommentPhoto(username string, photoId int64, text string) (
 		return nil, err
 	}
 
-	commentId = uint64(lastInsertID)
+	commentId := uint64(lastInsertID)
 	return Comment{commentId, photoId, username, text}, nil
 }
 
 var ErrCommentDoesNotExist = errors.New("The comment does not exist!")
+
 func (db *appdbimpl) UncommentPhoto(commentId uint64) error {
 	res, err := db.c.Exec(`DELETE FROM comments WHERE commentId=?`, commentId)
 	if err != nil {
