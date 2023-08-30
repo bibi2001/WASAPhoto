@@ -24,6 +24,11 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	username := requestBody.Name
+	// Checking if the username is in the predicted format
+	if !ValidateUsername(username) {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
 	userIdentifier, err := rt.db.GetUserId(username)
 	if err != nil {
 		http.Error(w, "Failed to retrieve user identifier", http.StatusInternalServerError)
