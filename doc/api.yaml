@@ -149,10 +149,16 @@ paths:
           description: User not found
       security:
       - bearerAuth: []
-  /users/{username}/followers:
+  /users/{username}/followers/{authUser}:
     parameters:
       - $ref: "#/components/parameters/username"
-    post:
+      - name: authUser
+        in: path
+        schema:
+          type: string
+        description: The username of the user to ban or unban
+        required: true
+    put:
       tags: ["follows"]
       summary: Follow a user
       description: |-
@@ -199,7 +205,10 @@ paths:
     put:
       tags: ["bans"]
       summary: Ban a user
-      description: Ban the user with the username given, a user can't ban themselves
+      description: |-
+        Ban the user with the specified username. 
+        The authenticated user will ban the user with the given username.
+        A user can't unfollow themselves
       operationId: banUser
       responses:
         '201': 
@@ -213,7 +222,10 @@ paths:
     delete:
       tags: ["bans"]
       summary: Unban a user
-      description: Unban the user with the username given, a user can't ban themselves
+      description: |-
+        Unban the user with the specified username. 
+        The authenticated user will unban the user with the given username.
+        A user can't unfollow themselves
       operationId: unbanUser
       responses:
         '204': 
@@ -278,8 +290,8 @@ paths:
       - bearerAuth: [] 
     get:
       tags: ["photos"]
-      summary: get photo with the given Id
-      description: show the photo with the given Id
+      summary: Get a photo
+      description: Get the photo with the given Id
       operationId: getPhoto
       responses:
         '200':
@@ -296,8 +308,8 @@ paths:
   /photo/{photoId}/comments:
     get:
       tags: ["comments"]
-      summary: list all comments in photo with the given Id
-      description: list all the comments in a photo
+      summary: List all comments in photo with the given Id
+      description: List all the comments in a photo
       operationId: listComments
       parameters:
         - $ref: "#/components/parameters/photoId"
@@ -317,13 +329,13 @@ paths:
       - bearerAuth: [] 
     post:
       tags: ["comments"]
-      summary: add a comment to a photo
-      description: add a comment to a photo given the id of the photo
+      summary: Add a comment to a photo
+      description: Add a comment to a photo given the id of the photo
       operationId: commentPhoto
       parameters:
         - $ref: "#/components/parameters/photoId"
       requestBody:
-        description: add a comment to an existing photo
+        description: Add a comment to an existing photo
         content:
           application/json:
             schema:
@@ -345,8 +357,8 @@ paths:
   /photo/{photoId}/comments/{commentId}:
     delete: 
       tags: ["comments"]
-      summary: uncomment a photo
-      description: delete a comment on a photo from the user's own photo
+      summary: Uncomment a photo
+      description: Delete a comment on a photo from the user's own photo
       operationId: uncommentPhoto
       parameters:
         - $ref: "#/components/parameters/photoId"
@@ -390,7 +402,11 @@ paths:
           description: Photo not found
       security:
       - bearerAuth: []
-    post:
+  /photo/{photoId}/likes/{username}:
+    parameters:
+      - $ref: "#/components/parameters/photoId"
+      - $ref: "#/components/parameters/username"
+    get:
       tags: ["likes"]
       summary: like the photo with the id
       description: like the photo with the id with the authenticated user
