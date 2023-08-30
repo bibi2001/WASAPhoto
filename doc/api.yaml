@@ -470,10 +470,15 @@ components:
     Photo:
       type: object
       properties:
-        id:
+        photoId:
           type: integer
           format: int 64
           example: 10
+        image:
+          type: string
+          format: binary
+          minLength: 1
+          maxLength: 32505856 
         username:
           type: string
           example: jonhDoe
@@ -495,11 +500,6 @@ components:
           description: upload date
           type: string
           format: date-time
-        image:
-          type: string
-          format: binary
-          minLength: 1
-          maxLength: 32505856 
         caption:
           type: string
           minLength: 1
