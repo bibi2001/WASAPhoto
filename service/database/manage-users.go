@@ -130,7 +130,7 @@ func UserExists(username string) (bool, error) {
 	return exists, nil
 }
 
-func GetUserID(username string) (int64, error) {
+func GetUserId(username string) (int64, error) {
 	userExists, err := UserExists(username)
 	if err != nil {
 		return 0, err
@@ -150,5 +150,16 @@ func GetUserID(username string) (int64, error) {
 	}
 
 	return userId, nil
+}
+
+func GetUsername(userId int64) (string, error) {
+	var username string
+
+	err := db.c.QueryRow(`SELECT username FROM users WHERE userId=?`, userId).Scan(&username)
+	if err != nil {
+		return "", err
+	}
+
+	return username, nil
 }
 

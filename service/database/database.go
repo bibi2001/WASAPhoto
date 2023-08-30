@@ -72,7 +72,8 @@ type AppDatabase interface {
 	GetUserProfile(username string, authUser string) (UserProfile, error)
 	UserSearch(searchQuery string, authUser string) ([]string, error)
 	UserExists(username string) (bool, error)
-	GetUserID(username string) (int64, error) 
+	GetUserId(username string) (int64, error) 
+	GetUsername(userId int64) (string, error)
 
 	Ping() error
 }
