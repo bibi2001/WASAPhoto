@@ -58,12 +58,12 @@ paths:
   /home:
     get:
       tags: ["stream"]
-      summary: authenticated user's feed
-      description: see the authenticated user's feed in reverse chronological order
+      summary: Authenticated user's feed
+      description: Show the authenticated user's feed in reverse chronological order
       operationId: getMyStream
       responses:
         '200':
-          description: feed sucessfuly shown
+          description: Feed sucessfuly shown
           content:
             application/json:
                 schema:
@@ -71,12 +71,13 @@ paths:
                   items:
                     $ref: '#/components/schemas/Photo'
       security:
-      - bearerAuth: [] 
+      - bearerAuth: []
+
   /users/search:
     get:
       tags: ["users"]
-      summary: search users
-      description: search tab for searching other users
+      summary: Search users
+      description: Search for users that match the query
       operationId: searchUsers
       parameters:
         - name: q
@@ -103,9 +104,9 @@ paths:
   /user/{username}:
     get:
       tags: ["users"]
-      summary: show user's profile
-      description:  |
-        show the user's profile, that contains:
+      summary: User's profile
+      description: |-
+        Show the user's profile, that contains:
         the user’s photos (in reverse chronological order), how many photos have 
         been uploaded, the user's username, followers and following.
       operationId: getUserProfile
@@ -127,13 +128,13 @@ paths:
   /user/{username}/username:
     put:
       tags: ["users"]
-      summary: update username
-      description: this can only be done by the logged in user.
+      summary: Update username
+      description: Updating authenticated user's username
       operationId: setMyUserName
       parameters:
         - $ref: "#/components/parameters/username"
       requestBody:
-        description: username
+        description: Username
         required: true
         content:
           application/json:
@@ -153,8 +154,11 @@ paths:
       - $ref: "#/components/parameters/username"
     post:
       tags: ["follows"]
-      summary: follow a user
-      description: follow the user with the username given, a user can't follow themselves
+      summary: Follow a user
+      description: |-
+        Follow the user with the specified username. 
+        The authenticated user will follow the user with the given username.
+        A user can't follow themselves
       operationId: followUser
       responses:
         '201': 
@@ -167,8 +171,11 @@ paths:
       - bearerAuth: []
     delete:
       tags: ["follows"]
-      summary: unfollow a user
-      description: unfollow the user with the searched username
+      summary: Unfollow a user
+      description: |-
+        Unfollow the user with the specified username. 
+        The authenticated user will unfollow the user with the given username.
+        A user can't unfollow themselves
       operationId: unfollowUser
       parameters:
         - $ref: "#/components/parameters/username"
@@ -176,7 +183,7 @@ paths:
           in: path
           schema:
             type: string
-          description: the username of the user to follow
+          description: The username of the user to follow
           required: true
       responses:
         '204': 
@@ -188,13 +195,19 @@ paths:
       security:
       - bearerAuth: []
       
-  /bans/{username}:
+  /users/{username}/bans/{bannedUser}:
     parameters:
       - $ref: "#/components/parameters/username"
+      - name: bannedUser
+        in: path
+        schema:
+          type: string
+        description: The username of the user to ban or unban
+        required: true
     post:
       tags: ["bans"]
-      summary: ban a user
-      description: ban the user with the username given, a user can't ban themself
+      summary: Ban a user
+      description: Ban the user with the username given, a user can't ban themselves
       operationId: banUser
       responses:
         '201': 
@@ -207,17 +220,9 @@ paths:
       - bearerAuth: []
     delete:
       tags: ["bans"]
-      summary: unban a user
-      description: unban the user with the username given
+      summary: Unban a user
+      description: Unban the user with the username given, a user can't ban themselves
       operationId: unbanUser
-      parameters:
-        - $ref: "#/components/parameters/username"
-        - name: authUsername
-          in: path
-          schema:
-            type: string
-          description: the username of the authenticated user
-          required: true
       responses:
         '204': 
           description: Sucessfully unbanned user
@@ -231,8 +236,8 @@ paths:
   /photo:
     post:
       tags: ["photos"]
-      summary: upload photo
-      description: upload a new photo by the authenticated user
+      summary: Upload photo
+      description: Upload a new photo by the authenticated user
       operationId: uploadPhoto
       requestBody:
         required: true
@@ -267,8 +272,8 @@ paths:
       - $ref: "#/components/parameters/photoId"
     delete:
       tags: ["photos"]
-      summary: delete photo with the given Id
-      description: delete a photo that was posted by the authenticated user
+      summary: Delete photo with the given Id
+      description: Delete a photo that was posted by the authenticated user
       operationId: deletePhoto
       responses:
         '204': 
