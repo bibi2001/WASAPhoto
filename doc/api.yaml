@@ -165,7 +165,6 @@ paths:
           description: User not found
       security:
       - bearerAuth: []
-  /users/{username}/followers/{followUsername}:
     delete:
       tags: ["follows"]
       summary: unfollow a user
@@ -189,14 +188,14 @@ paths:
       security:
       - bearerAuth: []
       
-  /users/{username}/bans:
+  /bans/{username}:
+    parameters:
+      - $ref: "#/components/parameters/username"
     post:
       tags: ["bans"]
       summary: ban a user
       description: ban the user with the username given, a user can't ban themself
       operationId: banUser
-      parameters:
-      - $ref: "#/components/parameters/username"
       responses:
         '201': 
           description: Sucessfully banned user
@@ -206,8 +205,6 @@ paths:
           description: User not found
       security:
       - bearerAuth: []
-  
-  /users/{authUsername}/bans/{username}:
     delete:
       tags: ["bans"]
       summary: unban a user
