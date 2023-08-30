@@ -28,12 +28,14 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	// Set the Bearer token
+    w.Header().Set("Authorization", "Bearer "+userIdentifier) 
+    w.WriteHeader(http.StatusCreated)
+
 	// Return the user identifier in the response
 	responseData := LoginResponse{
 		Identifier: userIdentifier,
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(responseData)
 }
