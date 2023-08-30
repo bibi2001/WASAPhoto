@@ -1,24 +1,32 @@
 package database
-import "github.com/bibi2001/WASAPhoto/service/globaltime"
 
-func (db *appdbimpl) UploadPhoto(username string, caption string) (Photo, error) {
+import (
+	"database/sql"
+	"errors"
+
+	"github.com/bibi2001/WASAPhoto/service/api/utils"
+	"github.com/bibi2001/WASAPhoto/service/globaltime"
+)
+
+func (db *appdbimpl) UploadPhoto(username string, caption string) (utils.Photo, error) {
 	t := globaltime.Now()
 	res, err := db.c.Exec(`INSERT INTO photos (photoId, username, date, caption) 
 		VALUES (NULL, ?, ?, ?)`, username, t, caption)
-if err != nil {
-	return nil, err
-}
+	if err != nil {
+		return utils.Photo{}, err
+	}
 
-lastInsertID, err := res.LastInsertId()
-if err != nil {
-	return nil, err
-}
+	lastInsertID, err := res.LastInsertId()
+	if err != nil {
+		return utils.Photo{}, err
+	}
 
-p := Photo{int64(lastInsertID), username, t, caption, 0, 0, false}
-return p, nil
+	p := utils.Photo{PhotoId: int64(lastInsertID), Username: username, Date: t, Caption: caption, NComments: 0, NLikes: 0, IsLiked: false}
+	return p, nil
 }
 
 var ErrPhotoDoesNotExist = errors.New("The photo does not exist!")
+
 func (db *appdbimpl) DeletePhoto(photoId int64) error {
 	res, err := db.c.Exec(`DELETE FROM photos WHERE photoId=?`, photoId)
 	if err != nil {
@@ -35,45 +43,45 @@ func (db *appdbimpl) DeletePhoto(photoId int64) error {
 	return nil
 }
 
-func (db *appdbimpl) GetPhoto(username string, photoId int64) (Photo, error) {
-
-	var p Photo 
+func (db *appdbimpl) GetPhoto(username string, photoId int64) (utils.Photo, error) {
+	var p utils.Photo
 	// Plain simple SELECT to get photo info on photos table
-	err := db.c.Query(`SELECT * FROM photos WHERE photoId=?`, photoId).Scan(
+	err := db.c.QueryRow(`SELECT photoId, username, date, caption 
+		FROM photos WHERE photoId=?`, photoId).Scan(
 		&p.PhotoId, &p.Username, &p.Date, &p.Caption)
 	if err == sql.ErrNoRows {
-		return nil, ErrPhotoDoesNotExist
-	}	
-	if err != nil {
-		return nil, err
+		return utils.Photo{}, ErrPhotoDoesNotExist
 	}
-	
-	// Plain simple SELECT to get photo info on comments table
-	err := db.c.Query(`SELECT count(*) FROM comments WHERE photoId=?`, photoId).Scan(&p.NComments)
 	if err != nil {
-		return nil, err
+		return utils.Photo{}, err
+	}
+
+	// Plain simple SELECT to get photo info on comments table
+	err = db.c.QueryRow(`SELECT count(*) FROM comments WHERE photoId=?`, photoId).Scan(&p.NComments)
+	if err != nil {
+		return utils.Photo{}, err
 	}
 	// Plain simple SELECT to get photo info on likes table
-	err := db.c.Query(`SELECT count(*) FROM likes WHERE photoId=?`, photoId).Scan(&p.NLikes)
+	err = db.c.QueryRow(`SELECT count(*) FROM likes WHERE photoId=?`, photoId).Scan(&p.NLikes)
 	if err != nil {
-		return nil, err
+		return utils.Photo{}, err
 	}
 	// Plain simple SELECT to get photo and user relation info on likes table
-	err:= db.c.Query(`SELECT EXISTS (
+	err = db.c.QueryRow(`SELECT EXISTS (
 		SELECT 1 FROM likes WHERE photoId = ? AND username = ?
 		)`, photoId, username).Scan(&p.IsLiked)
 	if err != nil {
-		return nil, err
+		return utils.Photo{}, err
 	}
-	
+
 	return p, nil
 }
 
-func (db *appdbimpl) ListUserPhotos(username string) ([]Photo, error) {
-	var ret []Photo
+func (db *appdbimpl) ListUserPhotos(username string) ([]utils.Photo, error) {
+	var ret []utils.Photo
 
 	// Plain simple SELECT
-	rows, err := db.c.Query(`SELECT photoId FROM photos WHERE username=?`, 
+	rows, err := db.c.Query(`SELECT photoId FROM photos WHERE username=?`,
 		username)
 	if err != nil {
 		return nil, err
@@ -87,13 +95,13 @@ func (db *appdbimpl) ListUserPhotos(username string) ([]Photo, error) {
 		if err != nil {
 			return nil, err
 		}
-		p, err := getPhoto(username, id)
+		p, err := db.GetPhoto(username, id)
 		if err != nil {
 			return nil, err
 		}
 		ret = append(ret, p)
 	}
-	
+
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
@@ -101,22 +109,20 @@ func (db *appdbimpl) ListUserPhotos(username string) ([]Photo, error) {
 	return ret, nil
 }
 
-
 func (db *appdbimpl) IsPhotoOwner(username string, photoId int64) (bool, error) {
-    var isPhotoOwner bool
+	var isPhotoOwner bool
 
 	// Plain simple SELECT
-    err := db.c.QueryRow(`SELECT EXISTS (
+	err := db.c.QueryRow(`SELECT EXISTS (
         SELECT 1 FROM photos WHERE username=? AND photoId = ?
     )`, username, photoId).Scan(&isPhotoOwner)
 
-    if err != nil {
-        return false, err
-    }
+	if err != nil {
+		return false, err
+	}
 
-    return isPhotoOwner, nil
+	return isPhotoOwner, nil
 }
-
 
 func (db *appdbimpl) PhotoExists(photoId int64) (bool, error) {
 	var exists bool
