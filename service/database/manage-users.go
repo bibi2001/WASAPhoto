@@ -117,7 +117,7 @@ func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, 
 	return ret, nil
 }
 
-func UserExists(username string) (bool, error) {
+func (db *appdbimpl) UserExists(username string) (bool, error) {
 	var exists bool
 
 	err := db.c.QueryRow(`SELECT EXISTS (
@@ -130,7 +130,7 @@ func UserExists(username string) (bool, error) {
 	return exists, nil
 }
 
-func GetUserId(username string) (int64, error) {
+func (db *appdbimpl) GetUserId(username string) (int64, error) {
 	userExists, err := UserExists(username)
 	if err != nil {
 		return 0, err
@@ -152,7 +152,7 @@ func GetUserId(username string) (int64, error) {
 	return userId, nil
 }
 
-func GetUsername(userId int64) (string, error) {
+func (db *appdbimpl) GetUsername(userId int64) (string, error) {
 	var username string
 
 	err := db.c.QueryRow(`SELECT username FROM users WHERE userId=?`, userId).Scan(&username)
