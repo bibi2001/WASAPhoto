@@ -6,16 +6,16 @@ more specifically in the database and api subdirectories.
 package utils
 
 type Comment struct {
-	CommentID int64  `json:"commentId"`
-	PhotoID   int64  `json:"photoId"`
+	CommentId int64  `json:"commentId"`
+	PhotoId   int64  `json:"photoId"`
 	Username  string `json:"username"`
 	Text      string `json:"text"`
 }
 
 type Photo struct {
-	PhotoID   int64  `json:"photoId"`
+	PhotoId   int64  `json:"photoId"`
 	Username  string `json:"username"`
-	Image     string `json:"image"`
+	Image     []byte `json:"image"`
 	Date      string `json:"date"`
 	Caption   string `json:"caption"`
 	NComments int64  `json:"nComments"`
@@ -25,7 +25,7 @@ type Photo struct {
 
 type UserProfile struct {
 	Username   string  `json:"username"`
-	Name       string  `json:"name"`
+	UserId     string  `json:"userId"`
 	NPosts     int64   `json:"nPosts"`
 	NFollowers int64   `json:"nFollowers"`
 	NFollowing int64   `json:"nFollowing"`

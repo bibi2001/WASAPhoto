@@ -7,7 +7,7 @@ import (
 	"github.com/bibi2001/WASAPhoto/service/globaltime"
 )
 
-func (db *appdbimpl) UploadPhoto(username string, caption string, image string) (Photo, error) {
+func (db *appdbimpl) UploadPhoto(username string, caption string, image []byte) (Photo, error) {
 	t := globaltime.Now()
 
 	res, err := db.c.Exec(`INSERT INTO photos (photoId, image, username, date, caption) 
