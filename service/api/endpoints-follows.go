@@ -55,6 +55,7 @@ func (rt *_router) changeFollowUser(w http.ResponseWriter, r *http.Request, ps h
     }
 
 	if isFollowing {
+		// Follow user
 		err = rt.db.FollowUser(authUser, userToFollow)
     	if err != nil {
         	ctx.Logger.WithError(err).Error("can't follow user")
@@ -63,6 +64,7 @@ func (rt *_router) changeFollowUser(w http.ResponseWriter, r *http.Request, ps h
     	}
 		w.WriteHeader(http.StatusCreated)
 	} else {
+		// Unfollow user
 		err = rt.db.UnfollowUser(authUser, userToFollow)
     	if err != nil {
         	ctx.Logger.WithError(err).Error("can't unfollow user")
