@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/bibi2001/WASAPhoto/service/api/utils"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/bibi2001/WASAPhoto/service/globaltime"
 )
 
