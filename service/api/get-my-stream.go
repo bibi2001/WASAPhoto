@@ -25,7 +25,7 @@ func (rt *_router) GetMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	userStream, err := GetUserStream(authUser)
+	userStream, err := rt.db.GetUserStream(authUser)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("could not get user stream")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
