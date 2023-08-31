@@ -65,3 +65,18 @@ func (db *appdbimpl) ListComments(photoId int64) ([]Comment, error) {
 
 	return ret, nil
 }
+
+func (db *appdbimpl) IsAuthor(username string, commentId int64) (bool, error) {
+	var isAuthor bool
+
+	// Plain simple SELECT
+	err := db.c.QueryRow(`SELECT EXISTS (
+        SELECT 1 FROM photos WHERE username=? AND photoId = ?
+    )`, username, commentId).Scan(&isAuthor)
+
+	if err != nil {
+		return false, err
+	}
+
+	return isAuthor, nil
+}

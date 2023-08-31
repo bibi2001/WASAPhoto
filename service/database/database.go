@@ -46,6 +46,7 @@ type AppDatabase interface {
 	CommentPhoto(username string, photoId int64, text string) (Comment, error)
 	UncommentPhoto(commentId uint64) error
 	ListComments(photoId int64) ([]Comment, error)
+	IsAuthor(username string, commentId int64) (bool, error)
 
 	FollowUser(followingUser string, followedUser string) error
 	UnfollowUser(followingUser string, followedUser string) error
@@ -63,7 +64,6 @@ type AppDatabase interface {
 	GetPhoto(username string, photoId int64) (Photo, error)
 	ListUserPhotos(username string) ([]Photo, error)
 	IsPhotoOwner(username string, photoId int64) (bool, error)
-	PhotoExists(photoId int64) (bool, error)
 
 	GetUserStream(username string) ([]Photo, error)
 
