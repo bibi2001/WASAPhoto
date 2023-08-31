@@ -2,6 +2,8 @@ package database
 
 import (
 	"errors"
+
+	"github.com/bibi2001/WASAPhoto/service/api/utils"
 )
 
 func (db *appdbimpl) CommentPhoto(username string, photoId int64, text string) (Comment, error) {
