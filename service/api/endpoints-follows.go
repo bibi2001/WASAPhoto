@@ -1,20 +1,23 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) FollowsEndpoints(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// Read the username to be followed from the request body.
-	var userToFollow string
-	err := json.NewDecoder(r.Body).Decode(&userToFollow)
-	if err != nil {
-		// The body was not a parseable JSON, reject it
-		http.Error(w, "Invalid JSON Body", http.StatusBadRequest)
+func (rt *_router) FollowUnfollow(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Read the usernames from the parameters
+	userToFollow := ps.ByName("username")
+	authUser := ps.ByName("authUser")
+
+	if userToFollow == authUser {
+		// Here we validate the usernames, and we
+		// discovered that they are not valid.
+		// A user can't follow or unfollow themselves
+		http.Error(w, "Invalid Usernames. A user can't follow or unfollow themselves",
+			http.StatusBadRequest)
 		return
 	}
 
@@ -27,7 +30,7 @@ func (rt *_router) FollowsEndpoints(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 	if !usernameExists {
-		// Here we validate the Request Body username, and we
+		// Here we validate the username, and we
 		// discovered that it is not valid.
 		http.Error(w, "Invalid Username", http.StatusBadRequest)
 		return
@@ -40,15 +43,20 @@ func (rt *_router) FollowsEndpoints(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 	// Get the username corresponding to the Token
-	authUser, err := rt.db.GetUsername(token)
+	authUsername, err := rt.db.GetUsername(token)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("authenticated username can not be found")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	if authUser != authUsername {
+		http.Error(w, "Authenticated userID doesn't match authenticated username",
+			http.StatusUnauthorized)
+		return
+	}
 
 	// Check if we should follow or unfollow the user
-	if r.Method == http.MethodPost {
+	if r.Method == http.MethodPut {
 		// Follow user
 		err = rt.db.FollowUser(authUser, userToFollow)
 		if err != nil {
