@@ -83,8 +83,8 @@ func (db *appdbimpl) ListUserPhotos(username string) ([]Photo, error) {
 	var ret []Photo
 
 	// Plain simple SELECT
-	rows, err := db.c.Query(`SELECT photoId FROM photos WHERE username=?`,
-		username)
+	rows, err := db.c.Query(`SELECT photoId FROM photos
+		WHERE username = ? ORDER BY date DESC`, username)
 	if err != nil {
 		return nil, err
 	}
