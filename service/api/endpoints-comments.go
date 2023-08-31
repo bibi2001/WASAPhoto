@@ -98,3 +98,21 @@ func (rt *_router) UncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (rt *_router) ListComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Read the photoId from the parameters
+	photoId := ps.ByName("photoId")
+
+	// Get the comments list from the database
+	commentList, err := rt.db.ListComments(photoId)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("could not get comments list")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Return comments list
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(commentList)
+}

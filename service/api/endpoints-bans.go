@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
@@ -64,7 +65,7 @@ func (rt *_router) BanUnban(w http.ResponseWriter, r *http.Request, ps httproute
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 	} else if r.Method == http.MethodDelete {
 		// Unban user
 		err = rt.db.UnbanUser(authUser, bannedUser)
@@ -76,4 +77,43 @@ func (rt *_router) BanUnban(w http.ResponseWriter, r *http.Request, ps httproute
 		w.WriteHeader(http.StatusNoContent)
 	}
 
+}
+
+func (rt *_router) ListBans(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Read the username from the parameters
+	username := ps.ByName("username")
+
+	// Get the Bearer Token in the header
+	token, err := GetBearerToken(r)
+	if err != nil {
+		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
+		return
+	}
+	// Get the username corresponding to the Token
+	authUsername, err := rt.db.GetUsername(token)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("authenticated username can not be found")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	// Check if the authenticated user is the profile owner
+	// Only the profile owner can check bans list
+	if username != authUsername {
+		http.Error(w, "Authenticated userID doesn't match profile owner",
+			http.StatusUnauthorized)
+		return
+	}
+
+	// Get the bans list from the database
+	bansList, err := rt.db.ListBans(username)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("could not get bans list")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Return bans list
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(bansList)
 }

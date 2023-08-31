@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
@@ -64,7 +65,7 @@ func (rt *_router) FollowUnfollow(w http.ResponseWriter, r *http.Request, ps htt
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 	} else if r.Method == http.MethodDelete {
 		// Unfollow user
 		err = rt.db.UnfollowUser(authUser, userToFollow)
@@ -76,4 +77,40 @@ func (rt *_router) FollowUnfollow(w http.ResponseWriter, r *http.Request, ps htt
 		w.WriteHeader(http.StatusNoContent)
 	}
 
+}
+
+func (rt *_router) ListFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Read the username from the parameters
+	username := ps.ByName("username")
+
+	// Get the followers list from the database
+	followersList, err := rt.db.ListFollowers(username)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("could not get followers list")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Return followers list
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(followersList)
+}
+
+func (rt *_router) ListFollowing(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Read the photoId from the parameters
+	username := ps.ByName("username")
+
+	// Get the following list from the database
+	followingList, err := rt.db.ListFollowing(username)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("could not get following list")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Return following list
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(followingList)
 }

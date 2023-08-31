@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
@@ -42,7 +43,7 @@ func (rt *_router) LikeUnlike(w http.ResponseWriter, r *http.Request, ps httprou
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 	} else if r.Method == http.MethodDelete {
 		// Unlike the photo
 		err = rt.db.UnlikePhoto(authUser, photoId)
@@ -54,4 +55,22 @@ func (rt *_router) LikeUnlike(w http.ResponseWriter, r *http.Request, ps httprou
 		w.WriteHeader(http.StatusNoContent)
 	}
 
+}
+
+func (rt *_router) ListLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Read the photoId from the parameters
+	photoId := ps.ByName("photoId")
+
+	// Get the likes list from the database
+	likeList, err := rt.db.ListLikes(photoId)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("could not get likes list")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Return likes list
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(likeList)
 }
