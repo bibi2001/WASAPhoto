@@ -34,6 +34,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
+	"github.com/bibi2001/WASAPhoto/service/api/utils"
 )
 
 // AppDatabase is the high level interface for the DB
