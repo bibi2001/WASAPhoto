@@ -59,3 +59,49 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusCreated)
 	_ = json.NewEncoder(w).Encode(photo)
 }
+
+func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Read the photoId from the parameters
+	photoId := ps.ByName("photoId")
+
+	// Check the validaty of the photoId parameter
+	photoExists, err := rt.db.PhotoExists(photoId)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error searching for the photo")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	if !photoExists {
+		http.Error(w, "Invalid photoID", http.StatusBadRequest)
+		return
+	}
+
+	// Get the Bearer Token in the header
+	token, err := GetBearerToken(r)
+	if err != nil {
+		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
+		return
+	}
+
+	// Get the username corresponding to the Token
+	authUser, err := rt.db.GetUsername(token)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("authenticated username cannot be found")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the photo from the database
+	photo, err := rt.db.GetPhoto(authUser, photoId)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("could not get user photo")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Return photo
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(photo)
+
+}
