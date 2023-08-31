@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/bibi2001/WASAPhoto/service/api/utils"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 )
 
 func (db *appdbimpl) CreateUser(username string) error {
