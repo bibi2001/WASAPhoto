@@ -63,18 +63,7 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Read the photoId from the parameters
 	photoId := ps.ByName("photoId")
-
-	// Check the validaty of the photoId parameter
-	photoExists, err := rt.db.PhotoExists(photoId)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("error searching for the photo")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	if !photoExists {
-		http.Error(w, "Invalid photoID", http.StatusBadRequest)
-		return
-	}
+	// There is no need to validate the identifier as we already do that on the database respective file
 
 	// Get the Bearer Token in the header
 	token, err := GetBearerToken(r)
@@ -82,7 +71,6 @@ func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
 	}
-
 	// Get the username corresponding to the Token
 	authUser, err := rt.db.GetUsername(token)
 	if err != nil {

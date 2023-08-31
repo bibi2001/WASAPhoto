@@ -10,19 +10,9 @@ import (
 func (rt *_router) LikeUnlike(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Read the photoId from the parameters
 	photoId := ps.ByName("photoId")
+	// There is no need to validate the identifier
+	// we already do that on the database respective file
 	authUser := ps.ByName("username")
-
-	// Check the validaty of the photoId parameter
-	photoExists, err := rt.db.PhotoExists(photoId)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("error searching for the photo")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	if !photoExists {
-		http.Error(w, "Invalid photoID", http.StatusBadRequest)
-		return
-	}
 
 	// Get the Bearer Token in the header
 	token, err := GetBearerToken(r)
