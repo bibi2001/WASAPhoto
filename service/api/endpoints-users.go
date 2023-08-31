@@ -111,3 +111,36 @@ func (rt *_router) SetMyUsername(w http.ResponseWriter, r *http.Request, ps http
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func (rt *_router) SearchUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Read the photoId from the parameters
+	query := r.URL.Query().Get("query")
+
+	// Get the Bearer Token in the header
+	token, err := GetBearerToken(r)
+	if err != nil {
+		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
+		return
+	}
+	// Get the username corresponding to the Token
+	authUser, err := rt.db.GetUsername(token)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("authenticated username cannot be found")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the search result from the database
+	searchResult, err := rt.db.UserSearch(query, authUser)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("could not search result")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Return search result
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(searchResult)
+
+}
