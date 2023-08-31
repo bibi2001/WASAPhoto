@@ -8,6 +8,11 @@ import (
 	"regexp"
 )
 
+func ValidateCommentText(text string) bool {
+	// Comment text can have maximum of 20 characters
+	return len(text) < 21
+}
+
 func ValidateCaption(caption string) bool {
 	// Caption can have a maximum of 90 characters
 	return len(caption) < 91
