@@ -145,8 +145,58 @@ paths:
           description: Sucessfully changed username
         '400':
           description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
         '404': 
           description: User not found
+      security:
+      - bearerAuth: []
+
+  /users/{username}/following:
+    parameters:
+      - $ref: "#/components/parameters/username"
+    get:
+      tags: ["follows"]
+      summary: Get following list
+      description: Get a list of users who the user with the given username follows
+      operationId: listFollowing
+      responses:
+        '200':
+          description: Successfully list following
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Username'
+        '400':
+          description: Invalid parameters supplied
+        '404': 
+          description: Photo not found
+      security:
+      - bearerAuth: []
+
+  /users/{username}/followers:
+    parameters:
+      - $ref: "#/components/parameters/username"
+    get:
+      tags: ["follows"]
+      summary: Get followers list
+      description: Get a list of users who follow the user with the given username
+      operationId: listFollowers
+      responses:
+        '200':
+          description: Successfully list followers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Username'
+        '400':
+          description: Invalid parameters supplied
+        '404': 
+          description: Photo not found
       security:
       - bearerAuth: []
   /users/{username}/followers/{authUser}:
@@ -171,6 +221,8 @@ paths:
           description: Sucessfully followed user
         '400':
           description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
         '404': 
           description: User not found
       security:
@@ -188,11 +240,39 @@ paths:
           description: Sucessfully unfollowed user
         '400':
           description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
         '404': 
           description: User not found
       security:
       - bearerAuth: []
-      
+  
+  /users/{username}/bans:
+    get:
+      tags: ["bans"]
+      summary: List user bans
+      description: List all the bans made by the authenticated user
+      operationId: listBans
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        '200':
+          description: Sucessfully list bans
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Username'
+        '400':
+          description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
+        '404':
+          description: User not found
+      security:
+      - bearerAuth: [] 
+
   /users/{username}/bans/{bannedUser}:
     parameters:
       - $ref: "#/components/parameters/username"
@@ -208,13 +288,15 @@ paths:
       description: |-
         Ban the user with the specified username. 
         The authenticated user will ban the user with the given username.
-        A user can't unfollow themselves
+        A user can't ban themselves
       operationId: banUser
       responses:
         '201': 
           description: Sucessfully banned user
         '400':
           description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
         '404': 
           description: User not found
       security:
@@ -225,13 +307,15 @@ paths:
       description: |-
         Unban the user with the specified username. 
         The authenticated user will unban the user with the given username.
-        A user can't unfollow themselves
+        A user can't unban themselves
       operationId: unbanUser
       responses:
         '204': 
           description: Sucessfully unbanned user
         '400':
           description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
         '404': 
           description: User not found
       security:
@@ -277,13 +361,17 @@ paths:
     delete:
       tags: ["photos"]
       summary: Delete photo with the given Id
-      description: Delete a photo that was posted by the authenticated user
+      description: |-
+        Delete a photo that was posted by the authenticated user
+        This action is only available for the author
       operationId: deletePhoto
       responses:
         '204': 
           description: Photo sucessfuly delete
         '400':
           description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
         '404': 
           description: Photo not found
       security:
@@ -360,7 +448,9 @@ paths:
     delete: 
       tags: ["comments"]
       summary: Uncomment a photo
-      description: Delete a comment on a photo from the user's own photo
+      description: |-
+        Delete a comment that was posted by the authenticated user
+        This action is only available for the author
       operationId: uncommentPhoto
       parameters:
         - $ref: "#/components/parameters/photoId"
@@ -376,6 +466,8 @@ paths:
           description: Comment sucessfuly deleted
         '400':
           description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
         '404':
           description: Comment or Photo not found
       security:
@@ -431,6 +523,8 @@ paths:
           description: Sucessfuly unliked photo
         '400':
           description: Invalid parameters supplied
+        '403':
+          description: Forbidden action
         '404': 
           description: Photo not found
       security:
