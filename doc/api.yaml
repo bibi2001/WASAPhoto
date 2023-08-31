@@ -246,7 +246,7 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
@@ -406,7 +406,7 @@ paths:
     parameters:
       - $ref: "#/components/parameters/photoId"
       - $ref: "#/components/parameters/username"
-    get:
+    put:
       tags: ["likes"]
       summary: like the photo with the id
       description: like the photo with the id with the authenticated user
