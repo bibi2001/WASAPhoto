@@ -9,31 +9,30 @@ import (
 )
 
 func (rt *_router) GetUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
 	// Read the username from the parameters
 	username := ps.ByName("username")
 
+	// Check if the requested username exists
 	usernameExists, err := rt.db.UserExists(username)
 	if err != nil {
-		// In this case, we have an error on our side. Log the error (so we can be notified) and send a 500 to the user
-		// Note: we are using the "logger" inside the "ctx" (context) because the scope of this issue is the request.
+		// Log the error and return a 500 Internal Server Error
 		ctx.Logger.WithError(err).Error("can't validate username")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	if !usernameExists {
-		// Here we validate the username, and we
-		// discovered that it is not valid.
+		// Return a 400 Bad Request if the username is invalid
 		http.Error(w, "Invalid Username", http.StatusBadRequest)
 		return
 	}
 
-	// Get the Bearer Token in the header
+	// Get the Bearer Token from the request header
 	token, err := GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
 	}
+
 	// Get the username corresponding to the Token
 	authUser, err := rt.db.GetUsername(token)
 	if err != nil {
@@ -42,6 +41,7 @@ func (rt *_router) GetUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	// Get the user profile
 	userProfile, err := rt.db.GetUserProfile(username, authUser)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("could not get user profile")
@@ -49,9 +49,65 @@ func (rt *_router) GetUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	// Return user profile
+	// Return the user profile as JSON response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(userProfile)
+}
 
+func (rt *_router) SetMyUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Parse the JSON request body
+	var requestBody struct {
+		Username string `json:"username"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(w, "Invalid Request Body", http.StatusBadRequest)
+		return
+	}
+
+	// Get the new username from the JSON request
+	newUsername := requestBody.Username
+	if !ValidateUsername(newUsername) {
+		http.Error(w, "Invalid username format", http.StatusBadRequest)
+		return
+	}
+	// Read the old username from the parameters
+	oldUsername := ps.ByName("username")
+
+	// Check if the new username is different from the old one
+	if oldUsername == newUsername {
+		http.Error(w, "New username cannot match old username", http.StatusUnauthorized)
+		return
+	}
+
+	// Get the Bearer Token from the request header
+	token, err := GetBearerToken(r)
+	if err != nil {
+		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
+		return
+	}
+	// Get the username corresponding to the Token
+	authUsername, err := rt.db.GetUsername(token)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("authenticated username cannot be found")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Check if the user trying to change the username is authorized to do so
+	if authUsername != oldUsername {
+		http.Error(w, "Only the owner of the profile can edit the username", http.StatusUnauthorized)
+		return
+	}
+
+	// Update the username
+	err = rt.db.UpdateUsername(oldUsername, newUsername)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("can't update username")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
