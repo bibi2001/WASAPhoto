@@ -68,7 +68,7 @@ type AppDatabase interface {
 	GetUserStream(username string) ([]Photo, error)
 
 	CreateUser(username string) error
-	UpdateUsername(userId int64, newUsername string) error
+	UpdateUsername(oldUsername string, newUsername string) error
 	GetUserProfile(username string, authUser string) (UserProfile, error)
 	UserSearch(searchQuery string, authUser string) ([]string, error)
 	UserExists(username string) (bool, error)
