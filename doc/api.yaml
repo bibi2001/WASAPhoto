@@ -339,7 +339,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Comment'
+              type: string
+              example: 'what a cool photo'
         required: true
       responses:
         '201':
@@ -353,7 +354,8 @@ paths:
         '404':
           description: Photo not found
       security:
-      - bearerAuth: [] 
+      - bearerAuth: []
+
   /photo/{photoId}/comments/{commentId}:
     delete: 
       tags: ["comments"]
