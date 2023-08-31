@@ -18,8 +18,8 @@ func (db *appdbimpl) CreateUser(username string) error {
 	return nil
 }
 
-func (db *appdbimpl) UpdateUsername(userId int64, newUsername string) error {
-	_, err := db.c.Exec(`UPDATE users SET username=? WHERE userId=?`, newUsername, userId)
+func (db *appdbimpl) UpdateUsername(oldUsername string, newUsername string) error {
+	_, err := db.c.Exec(`UPDATE users SET username=? WHERE username=?`, newUsername, oldUsername)
 	// Check if username is unique
 	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 		return errors.New("Username given is not original enough.")
