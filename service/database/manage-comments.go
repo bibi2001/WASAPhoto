@@ -2,8 +2,6 @@ package database
 
 import (
 	"errors"
-	
-	"github.com/bibi2001/WASAPhoto/service/utils"
 )
 
 func (db *appdbimpl) CommentPhoto(username string, photoId int64, text string) (Comment, error) {
@@ -41,7 +39,7 @@ func (db *appdbimpl) UncommentPhoto(commentId uint64) error {
 }
 
 func (db *appdbimpl) ListComments(photoId int64) ([]Comment, error) {
-	var ret []SimpleComment
+	var ret []Comment
 
 	// Plain simple SELECT
 	rows, err := db.c.Query(`SELECT commentId, photoId, username, text FROM comments WHERE photoId=?`,
