@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
@@ -10,31 +9,24 @@ import (
 )
 
 func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// Parse the multipart form with a file size limit of 32Mb
-	err := r.ParseMultipartForm(32 << 20)
+	// Parse the JSON request body
+	var requestBody struct {
+		Image   string `json:"image"`
+		Caption string `json:"caption"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
 		http.Error(w, "Invalid Request Body", http.StatusBadRequest)
 		return
 	}
 
-	// Get the file from the form
-	file, _, err := r.FormFile("image")
-	if err != nil {
-		http.Error(w, "Error opening file", http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
+	// Get the image data from the JSON request
+	imageBytes := []byte(requestBody.Image)
 
-	// Read the image into a byte slice
-	imageBytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("failed reading the image file")
-		http.Error(w, "Error reading the file", http.StatusInternalServerError)
-		return
-	}
+	// Get the caption from the JSON request
+	caption := requestBody.Caption
 
-	// Get the caption from the form
-	caption := r.FormValue("caption")
 	if !ValidateCaption(caption) {
 		http.Error(w, "Invalid caption format", http.StatusBadRequest)
 		return
@@ -50,7 +42,7 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// Get the username corresponding to the Token
 	authUser, err := rt.db.GetUsername(token)
 	if err != nil {
-		ctx.Logger.WithError(err).Error("authenticated username can not be found")
+		ctx.Logger.WithError(err).Error("authenticated username cannot be found")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -64,7 +56,6 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-
 	w.WriteHeader(http.StatusCreated)
 	_ = json.NewEncoder(w).Encode(photo)
 }
