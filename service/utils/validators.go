@@ -6,6 +6,7 @@ package utils
 
 import (
 	"regexp"
+	"strconv"
 )
 
 func ValidateCommentText(text string) bool {
@@ -28,4 +29,14 @@ func ValidateUsername(username string) bool {
 
 	// Use the regex to match the username.
 	return regex.MatchString(username)
+}
+
+func ToInt64(s string) int64 {
+	// Convert the user string to int64
+	res, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return -1
+
+	}
+	return res
 }

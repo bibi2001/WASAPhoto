@@ -5,6 +5,8 @@ more specifically in the database and api subdirectories.
 
 package utils
 
+import "time"
+
 type Comment struct {
 	CommentId int64  `json:"commentId"`
 	PhotoId   int64  `json:"photoId"`
@@ -13,14 +15,14 @@ type Comment struct {
 }
 
 type Photo struct {
-	PhotoId   int64  `json:"photoId"`
-	Username  string `json:"username"`
-	Image     []byte `json:"image"`
-	Date      string `json:"date"`
-	Caption   string `json:"caption"`
-	NComments int64  `json:"nComments"`
-	NLikes    int64  `json:"nLikes"`
-	IsLiked   bool   `json:"isLiked"`
+	PhotoId   int64     `json:"photoId"`
+	Username  string    `json:"username"`
+	Image     []byte    `json:"image"`
+	Date      time.Time `json:"date"`
+	Caption   string    `json:"caption"`
+	NComments int64     `json:"nComments"`
+	NLikes    int64     `json:"nLikes"`
+	IsLiked   bool      `json:"isLiked"`
 }
 
 type UserProfile struct {

@@ -12,7 +12,7 @@ func (db *appdbimpl) CreateUser(username string) error {
 	_, err := db.c.Exec(`INSERT INTO users (userId, username) VALUES (NULL, ?)`, username)
 	// Check if username is unique
 	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-		return errors.New("Username given is not original enough.")
+		return errors.New("username given is not original enough")
 	} else if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func (db *appdbimpl) UpdateUsername(oldUsername string, newUsername string) erro
 	_, err := db.c.Exec(`UPDATE users SET username=? WHERE username=?`, newUsername, oldUsername)
 	// Check if username is unique
 	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-		return errors.New("Username given is not original enough.")
+		return errors.New("username given is not original enough")
 	} else if err != nil {
 		return err
 	}
@@ -32,52 +32,52 @@ func (db *appdbimpl) UpdateUsername(oldUsername string, newUsername string) erro
 	return nil
 }
 
-var ErrUserDoesNotExist = errors.New("The user does not exist!")
+var ErrUserDoesNotExist = errors.New("the user does not exist")
 
-func (db *appdbimpl) GetUserProfile(username string, authUser string) (UserProfile, error) {
-	var up UserProfile
+func (db *appdbimpl) GetUserProfile(username string, authUser string) (utils.UserProfile, error) {
+	var up utils.UserProfile
 
 	// Plain simple SELECT to get user info on users table
 	err := db.c.QueryRow(`SELECT * FROM users WHERE username=?`, username).Scan(
 		&up.Username, &up.UserId)
 	if err == sql.ErrNoRows {
-		return UserProfile{}, ErrUserDoesNotExist
+		return utils.UserProfile{}, ErrUserDoesNotExist
 	} else if err != nil {
-		return UserProfile{}, err
+		return utils.UserProfile{}, err
 	}
 
 	// Save number of followers into NFollowers
 	followers, err := db.ListFollowers(username)
 	if err != nil {
-		return UserProfile{}, err
+		return utils.UserProfile{}, err
 	}
 	up.NFollowers = int64(len(followers))
 
 	// Save number of following into NFollowing
 	following, err := db.ListFollowing(username)
 	if err != nil {
-		return UserProfile{}, err
+		return utils.UserProfile{}, err
 	}
 	up.NFollowing = int64(len(following))
 
 	// Save if user is followed into isFollowed
 	isFollowed, err := db.IsFollowed(authUser, username)
 	if err != nil {
-		return UserProfile{}, err
+		return utils.UserProfile{}, err
 	}
 	up.IsFollowed = isFollowed
 
 	// Save if user is banned into isBanned
 	isBanned, err := db.IsBanned(authUser, username)
 	if err != nil {
-		return UserProfile{}, err
+		return utils.UserProfile{}, err
 	}
 	up.IsBanned = isBanned
 
 	// Save user photos into photos
 	photos, err := db.ListUserPhotos(username)
 	if err != nil {
-		return UserProfile{}, err
+		return utils.UserProfile{}, err
 	}
 	up.Photos = photos
 	up.NPosts = int64(len(photos))
@@ -136,23 +136,23 @@ func (db *appdbimpl) UserExists(username string) (bool, error) {
 	return exists, nil
 }
 
-func (db *appdbimpl) GetUserId(username string) (int64, error) {
+func (db *appdbimpl) GetUserId(username string) (string, error) {
 	userExists, err := db.UserExists(username)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	if !userExists {
 		// Attempt to create the user
 		if err := db.CreateUser(username); err != nil {
-			return 0, err
+			return "", err
 		}
 	}
 
-	var userId int64
+	var userId string
 	err = db.c.QueryRow(`SELECT userId FROM users WHERE username=?`, username).Scan(&userId)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	return userId, nil

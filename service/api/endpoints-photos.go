@@ -3,10 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	
-	"github.com/bibi2001/WASAPhoto/service/database"
-	"github.com/bibi2001/WASAPhoto/service/utils"
+
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -29,13 +28,13 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// Get the caption from the JSON request
 	caption := requestBody.Caption
 
-	if !ValidateCaption(caption) {
+	if !utils.ValidateCaption(caption) {
 		http.Error(w, "Invalid caption format", http.StatusBadRequest)
 		return
 	}
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -68,7 +67,7 @@ func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// There is no need to validate the identifier as we already do that on the database respective file
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -82,7 +81,7 @@ func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Check if authenticated user is the owner of the photo
-	isPhotoOwner, err := rt.db.IsPhotoOwner(authUser, photoId)
+	isPhotoOwner, err := rt.db.IsPhotoOwner(authUser, utils.ToInt64(photoId))
 	if err != nil {
 		ctx.Logger.WithError(err).Error("could not get photo owner")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -94,7 +93,7 @@ func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	err = rt.db.DeletePhoto(photoId)
+	err = rt.db.DeletePhoto(utils.ToInt64(photoId))
 	if err != nil {
 		ctx.Logger.WithError(err).Error("could not delete photo")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -110,7 +109,7 @@ func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	// There is no need to validate the identifier as we already do that on the database respective file
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -124,7 +123,7 @@ func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	// Get the photo from the database
-	photo, err := rt.db.GetPhoto(authUser, photoId)
+	photo, err := rt.db.GetPhoto(authUser, utils.ToInt64(photoId))
 	if err != nil {
 		ctx.Logger.WithError(err).Error("could not get user photo")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -134,6 +133,6 @@ func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	// Return photo
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(photo)
+	_ = json.NewEncoder(w).Encode(photo)
 
 }

@@ -12,7 +12,7 @@ func (db *appdbimpl) LikePhoto(userId string, photoId int64) error {
 	return nil
 }
 
-var ErrLikeDoesNotExist = errors.New("The like does not exist!")
+var ErrLikeDoesNotExist = errors.New("the like does not exist")
 
 func (db *appdbimpl) UnlikePhoto(userId string, photoId int64) error {
 	res, err := db.c.Exec(`DELETE FROM likes WHERE photoId=? AND userId=?`, photoId, userId)

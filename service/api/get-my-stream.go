@@ -4,16 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/bibi2001/WASAPhoto/service/database"
-	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
 func (rt *_router) GetMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -37,6 +36,6 @@ func (rt *_router) GetMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	// Return user stream
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(userStream)
+	_ = json.NewEncoder(w).Encode(userStream)
 
 }

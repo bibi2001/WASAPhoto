@@ -3,10 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	
-	"github.com/bibi2001/WASAPhoto/service/database"
-	"github.com/bibi2001/WASAPhoto/service/utils"
+
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -29,7 +28,7 @@ func (rt *_router) GetUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Get the Bearer Token from the request header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -54,7 +53,7 @@ func (rt *_router) GetUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	// Return the user profile as JSON response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(userProfile)
+	_ = json.NewEncoder(w).Encode(userProfile)
 }
 
 func (rt *_router) SetMyUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -70,7 +69,7 @@ func (rt *_router) SetMyUsername(w http.ResponseWriter, r *http.Request, ps http
 
 	// Get the new username from the JSON request
 	newUsername := requestBody.Username
-	if !ValidateUsername(newUsername) {
+	if !utils.ValidateUsername(newUsername) {
 		http.Error(w, "Invalid username format", http.StatusBadRequest)
 		return
 	}
@@ -84,7 +83,7 @@ func (rt *_router) SetMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Get the Bearer Token from the request header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -119,7 +118,7 @@ func (rt *_router) SearchUsers(w http.ResponseWriter, r *http.Request, ps httpro
 	query := r.URL.Query().Get("query")
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -143,6 +142,6 @@ func (rt *_router) SearchUsers(w http.ResponseWriter, r *http.Request, ps httpro
 	// Return search result
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(searchResult)
+	_ = json.NewEncoder(w).Encode(searchResult)
 
 }

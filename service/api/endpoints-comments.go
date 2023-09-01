@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/bibi2001/WASAPhoto/service/database"
-	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -23,7 +22,7 @@ func (rt *_router) CommentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Get the text from the JSON request
 	text := requestBody.Text
-	if !ValidateCommentText(text) {
+	if !utils.ValidateCommentText(text) {
 		http.Error(w, "Invalid caption format", http.StatusBadRequest)
 		return
 	}
@@ -34,7 +33,7 @@ func (rt *_router) CommentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	// we already do that on the database respective file
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -48,7 +47,7 @@ func (rt *_router) CommentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Comment the photo
-	comment, err := rt.db.CommentPhoto(authUsername, photoId, text)
+	comment, err := rt.db.CommentPhoto(authUsername, utils.ToInt64(photoId), text)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("can't upload comment")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -66,7 +65,7 @@ func (rt *_router) UncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	// we already do that on the database respective file
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -79,7 +78,7 @@ func (rt *_router) UncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	isAuthor, err := rt.db.IsAuthor(authUsername, commentId)
+	isAuthor, err := rt.db.IsAuthor(authUsername, utils.ToInt64(commentId))
 	if err != nil {
 		ctx.Logger.WithError(err).Error("can't validate comment author")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -91,7 +90,7 @@ func (rt *_router) UncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Uncomment photo
-	err = rt.db.UncommentPhoto(commentId)
+	err = rt.db.UncommentPhoto(utils.ToInt64(commentId))
 	if err != nil {
 		ctx.Logger.WithError(err).Error("can't uncomment photo")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -106,7 +105,7 @@ func (rt *_router) ListComments(w http.ResponseWriter, r *http.Request, ps httpr
 	photoId := ps.ByName("photoId")
 
 	// Get the comments list from the database
-	commentList, err := rt.db.ListComments(photoId)
+	commentList, err := rt.db.ListComments(utils.ToInt64(photoId))
 	if err != nil {
 		ctx.Logger.WithError(err).Error("could not get comments list")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -116,5 +115,5 @@ func (rt *_router) ListComments(w http.ResponseWriter, r *http.Request, ps httpr
 	// Return comments list
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(commentList)
+	_ = json.NewEncoder(w).Encode(commentList)
 }

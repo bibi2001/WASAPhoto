@@ -20,7 +20,7 @@ func (db *appdbimpl) BanUser(authUser string, bannedUser string) error {
 	return nil
 }
 
-var ErrBanDoesNotExist = errors.New("The user is not banned!")
+var ErrBanDoesNotExist = errors.New("the user is not banned")
 
 func (db *appdbimpl) UnbanUser(authUser string, bannedUser string) error {
 	res, err := db.c.Exec(`DELETE FROM bans WHERE authUser=? AND bannedUser=?`,

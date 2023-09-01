@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/bibi2001/WASAPhoto/service/database"
-	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -18,7 +17,7 @@ func (rt *_router) LikeUnlike(w http.ResponseWriter, r *http.Request, ps httprou
 	authUser := ps.ByName("username")
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -39,7 +38,7 @@ func (rt *_router) LikeUnlike(w http.ResponseWriter, r *http.Request, ps httprou
 	// Check if we should like or unlike the photo
 	if r.Method == http.MethodPut {
 		// Like the photo
-		err = rt.db.LikePhoto(authUser, photoId)
+		err = rt.db.LikePhoto(authUser, utils.ToInt64(photoId))
 		if err != nil {
 			ctx.Logger.WithError(err).Error("can't like photo")
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -48,7 +47,7 @@ func (rt *_router) LikeUnlike(w http.ResponseWriter, r *http.Request, ps httprou
 		w.WriteHeader(http.StatusOK)
 	} else if r.Method == http.MethodDelete {
 		// Unlike the photo
-		err = rt.db.UnlikePhoto(authUser, photoId)
+		err = rt.db.UnlikePhoto(authUser, utils.ToInt64(photoId))
 		if err != nil {
 			ctx.Logger.WithError(err).Error("can't unlike photo")
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -64,7 +63,7 @@ func (rt *_router) ListLikes(w http.ResponseWriter, r *http.Request, ps httprout
 	photoId := ps.ByName("photoId")
 
 	// Get the likes list from the database
-	likeList, err := rt.db.ListLikes(photoId)
+	likeList, err := rt.db.ListLikes(utils.ToInt64(photoId))
 	if err != nil {
 		ctx.Logger.WithError(err).Error("could not get likes list")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -74,5 +73,5 @@ func (rt *_router) ListLikes(w http.ResponseWriter, r *http.Request, ps httprout
 	// Return likes list
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(likeList)
+	_ = json.NewEncoder(w).Encode(likeList)
 }

@@ -35,7 +35,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/bibi2001/WASAPhoto/service/api/utils"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 )
 
 // AppDatabase is the high level interface for the DB
@@ -45,9 +45,9 @@ type AppDatabase interface {
 	ListBans(authUsername string) ([]string, error)
 	IsBanned(authUser string, bannedUser string) (bool, error)
 
-	CommentPhoto(username string, photoId int64, text string) (Comment, error)
-	UncommentPhoto(commentId uint64) error
-	ListComments(photoId int64) ([]Comment, error)
+	CommentPhoto(username string, photoId int64, text string) (utils.Comment, error)
+	UncommentPhoto(commentId int64) error
+	ListComments(photoId int64) ([]utils.Comment, error)
 	IsAuthor(username string, commentId int64) (bool, error)
 
 	FollowUser(followingUser string, followedUser string) error
@@ -61,20 +61,20 @@ type AppDatabase interface {
 	UnlikePhoto(username string, photoId int64) error
 	ListLikes(photoId int64) ([]string, error)
 
-	UploadPhoto(username string, caption string, image []byte) (Photo, error)
+	UploadPhoto(username string, caption string, image []byte) (utils.Photo, error)
 	DeletePhoto(photoId int64) error
-	GetPhoto(username string, photoId int64) (Photo, error)
-	ListUserPhotos(username string) ([]Photo, error)
+	GetPhoto(username string, photoId int64) (utils.Photo, error)
+	ListUserPhotos(username string) ([]utils.Photo, error)
 	IsPhotoOwner(username string, photoId int64) (bool, error)
 
-	GetUserStream(username string) ([]Photo, error)
+	GetUserStream(username string) ([]utils.Photo, error)
 
 	CreateUser(username string) error
 	UpdateUsername(oldUsername string, newUsername string) error
-	GetUserProfile(username string, authUser string) (UserProfile, error)
+	GetUserProfile(username string, authUser string) (utils.UserProfile, error)
 	UserSearch(searchQuery string, authUser string) ([]string, error)
 	UserExists(username string) (bool, error)
-	GetUserId(username string) (int64, error)
+	GetUserId(username string) (string, error)
 	GetUsername(userId int64) (string, error)
 
 	Ping() error

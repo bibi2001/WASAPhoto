@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/bibi2001/WASAPhoto/service/database"
-	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -27,7 +26,7 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 	username := requestBody.Name
 	// Checking if the username is in the predicted format
-	if !ValidateUsername(username) {
+	if !utils.ValidateUsername(username) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
@@ -43,7 +42,7 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusCreated)
 
 	// Return the user identifier in the response
-	responseData := LoginResponse{
+	responseData := utils.LoginResponse{
 		Identifier: userIdentifier,
 	}
 	json.NewEncoder(w).Encode(responseData)

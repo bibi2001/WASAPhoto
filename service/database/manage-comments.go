@@ -6,25 +6,25 @@ import (
 	"github.com/bibi2001/WASAPhoto/service/utils"
 )
 
-func (db *appdbimpl) CommentPhoto(username string, photoId int64, text string) (Comment, error) {
+func (db *appdbimpl) CommentPhoto(username string, photoId int64, text string) (utils.Comment, error) {
 	res, err := db.c.Exec(`INSERT INTO comments (id, photoId, username, text) VALUES (NULL, ?, ?, ?)`,
 		photoId, username, text)
 	if err != nil {
-		return nil, err
+		return utils.Comment{}, err
 	}
 
 	lastInsertID, err := res.LastInsertId()
 	if err != nil {
-		return nil, err
+		return utils.Comment{}, err
 	}
 
-	commentId := uint64(lastInsertID)
-	return Comment{commentId, photoId, username, text}, nil
+	commentId := int64(lastInsertID)
+	return utils.Comment{CommentId: commentId, PhotoId: photoId, Username: username, Text: text}, nil
 }
 
-var ErrCommentDoesNotExist = errors.New("The comment does not exist!")
+var ErrCommentDoesNotExist = errors.New("the comment does not exist")
 
-func (db *appdbimpl) UncommentPhoto(commentId uint64) error {
+func (db *appdbimpl) UncommentPhoto(commentId int64) error {
 	res, err := db.c.Exec(`DELETE FROM comments WHERE commentId=?`, commentId)
 	if err != nil {
 		return err
@@ -40,8 +40,8 @@ func (db *appdbimpl) UncommentPhoto(commentId uint64) error {
 	return nil
 }
 
-func (db *appdbimpl) ListComments(photoId int64) ([]Comment, error) {
-	var ret []Comment
+func (db *appdbimpl) ListComments(photoId int64) ([]utils.Comment, error) {
+	var ret []utils.Comment
 
 	// Plain simple SELECT
 	rows, err := db.c.Query(`SELECT commentId, photoId, username, text FROM comments WHERE photoId=?`,
@@ -53,7 +53,7 @@ func (db *appdbimpl) ListComments(photoId int64) ([]Comment, error) {
 
 	// Here we read the resultset and we build the list to be returned
 	for rows.Next() {
-		var c Comment
+		var c utils.Comment
 		err = rows.Scan(&c.CommentId, &c.PhotoId, &c.Username, &c.Text)
 		if err != nil {
 			return nil, err

@@ -2,8 +2,8 @@ package database
 
 import "github.com/bibi2001/WASAPhoto/service/utils"
 
-func (db *appdbimpl) GetUserStream(username string) ([]Photo, error) {
-	var ret []Photo
+func (db *appdbimpl) GetUserStream(username string) ([]utils.Photo, error) {
+	var ret []utils.Photo
 
 	// Plain simple SELECT
 	rows, err := db.c.Query(`

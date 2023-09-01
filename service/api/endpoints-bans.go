@@ -3,10 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	
-	"github.com/bibi2001/WASAPhoto/service/database"
-	"github.com/bibi2001/WASAPhoto/service/utils"
+
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
+	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -40,7 +39,7 @@ func (rt *_router) BanUnban(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -86,7 +85,7 @@ func (rt *_router) ListBans(w http.ResponseWriter, r *http.Request, ps httproute
 	username := ps.ByName("username")
 
 	// Get the Bearer Token in the header
-	token, err := GetBearerToken(r)
+	token, err := utils.GetBearerToken(r)
 	if err != nil {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
@@ -117,5 +116,5 @@ func (rt *_router) ListBans(w http.ResponseWriter, r *http.Request, ps httproute
 	// Return bans list
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(bansList)
+	_ = json.NewEncoder(w).Encode(bansList)
 }

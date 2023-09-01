@@ -12,7 +12,7 @@ func (db *appdbimpl) FollowUser(followingUser string, followedUser string) error
 	return nil
 }
 
-var ErrFollowDoesNotExist = errors.New("The user is not followed!")
+var ErrFollowDoesNotExist = errors.New("the user is not followed")
 
 func (db *appdbimpl) UnfollowUser(followingUser string, followedUser string) error {
 	res, err := db.c.Exec(`DELETE FROM follows WHERE followingUser=? AND followedUser=?`,
