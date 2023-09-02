@@ -40,9 +40,9 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/photo/:photoId/comments/:commentId", rt.wrap(rt.UncommentPhoto))
 
 	// Likes
-	rt.router.GET("photo/:photoId/likes", rt.wrap(rt.ListLikes))
-	rt.router.PUT("photo/:photoId/likes/:username", rt.wrap(rt.LikeUnlike))
-	rt.router.DELETE("photo/:photoId/likes/:username", rt.wrap(rt.LikeUnlike))
+	rt.router.GET("/photo/:photoId/likes", rt.wrap(rt.ListLikes))
+	rt.router.PUT("/photo/:photoId/likes/:username", rt.wrap(rt.LikeUnlike))
+	rt.router.DELETE("/photo/:photoId/likes/:username", rt.wrap(rt.LikeUnlike))
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)

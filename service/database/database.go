@@ -105,11 +105,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "users" (
 			"userId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			"username"	TEXT NOT NULL UNIQUE,
+			"username"	TEXT NOT NULL UNIQUE
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
+			return nil, fmt.Errorf("error creating users table structure: %w", err)
 		}
 	}
 
@@ -117,9 +117,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "photos" (
 			"photoId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			"image" BLOB NOT NULL,
+			"image" 	BLOB NOT NULL,
 			"username"	TEXT NOT NULL,
-			"date"	TEXT NOT NULL,
+			"date"		DATETIME NOT NULL,
 			"caption"	TEXT,
 			FOREIGN KEY("username") REFERENCES "users"("username")
 				ON DELETE CASCADE
@@ -127,29 +127,27 @@ func New(db *sql.DB) (AppDatabase, error) {
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
+			return nil, fmt.Errorf("error creating photos table structure: %w", err)
 		}
 	}
 
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='comments';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "comments" (
-			"commentId"	INTEGER NOT NULL AUTOINCREMENT,
+			"commentId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			"photoId"	INTEGER NOT NULL,
 			"username"	TEXT NOT NULL,
-			"text"	TEXT NOT NULL,
-			PRIMARY KEY("commentId"),
+			"text"		TEXT NOT NULL,
 			FOREIGN KEY("photoId") REFERENCES "photos"("photoId")
 				ON DELETE CASCADE
         		ON UPDATE CASCADE,
 			FOREIGN KEY("username") REFERENCES "users"("username")
 				ON DELETE CASCADE
 				ON UPDATE CASCADE
-			
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
+			return nil, fmt.Errorf("error creating comments table structure: %w", err)
 		}
 	}
 
@@ -165,11 +163,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY("photoId") REFERENCES "photos"("photoId")
 				ON DELETE CASCADE
 				ON UPDATE CASCADE
-			
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
+			return nil, fmt.Errorf("error creating likes table structure: %w", err)
 		}
 	}
 
@@ -185,18 +182,17 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY("followedUser") REFERENCES "users"("username")
 				ON DELETE CASCADE
 				ON UPDATE CASCADE
-			
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
+			return nil, fmt.Errorf("error creating follows table structure: %w", err)
 		}
 	}
 
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='bans';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "bans" (
-			"authUser"	TEXT NOT NULL,
+			"authUser"		TEXT NOT NULL,
 			"bannedUser"	TEXT NOT NULL,
 			PRIMARY KEY("authUser","bannedUser"),
 			FOREIGN KEY("authUser") REFERENCES "users"("username")
@@ -205,11 +201,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY("bannedUser") REFERENCES "users"("username")
 				ON DELETE CASCADE
 				ON UPDATE CASCADE
-			
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
+			return nil, fmt.Errorf("error creating bans table structure: %w", err)
 		}
 	}
 
