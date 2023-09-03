@@ -270,13 +270,13 @@ paths:
       - bearerAuth: []
   
   /users/{username}/bans:
+    parameters:
+      - $ref: "#/components/parameters/username"
     get:
       tags: ["bans"]
       summary: List user bans
       description: List all the bans made by the authenticated user
       operationId: listBans
-      parameters:
-        - $ref: "#/components/parameters/username"
       responses:
         '200':
           description: Sucessfully list bans
@@ -481,6 +481,16 @@ paths:
       - bearerAuth: []
 
   /photo/{photoId}/comments/{commentId}:
+    parameters:
+      - $ref: "#/components/parameters/photoId"
+      - name: commentId
+        in: path
+        schema:
+          description: Identifier of the comment
+          type: integer
+          example: 1
+        description: the id of the comment
+        required: true
     delete: 
       tags: ["comments"]
       summary: Uncomment a photo
@@ -488,16 +498,7 @@ paths:
         Delete a comment that was posted by the authenticated user
         This action is only available for the author
       operationId: uncommentPhoto
-      parameters:
-        - $ref: "#/components/parameters/photoId"
-        - name: commentId
-          in: path
-          schema:
-            description: Identifier of the comment
-            type: integer
-            example: 1
-          description: the id of the comment
-          required: true
+      
       responses:
         '204':
           description: Comment sucessfuly deleted
