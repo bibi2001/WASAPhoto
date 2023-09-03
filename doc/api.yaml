@@ -36,6 +36,7 @@ paths:
               type: object
               properties:
                 name:
+                  description: Valid username
                   type: string
                   example: Maria
                   pattern: 'ˆ.*?$'
@@ -51,10 +52,9 @@ paths:
                 type: object
                 properties:
                   identifier:
-                    # change here if you decide to use an integer
-                    # or any other type of identifier
-                    type: string
-                    example: "abcdef012345"
+                    description: User identifier
+                    type: integer
+                    example: 1
   /home:
     get:
       tags: ["stream"]
@@ -366,11 +366,13 @@ paths:
               type: object
               properties:
                 image:
+                  description: image in binary format
                   type: string
                   format: binary
                   minLength: 1
                   maxLength: 32505856
                 caption:
+                  description: caption of the photo
                   type: string
                   minLength: 1
                   maxLength: 90
@@ -576,59 +578,68 @@ paths:
 components:
   schemas:
     Username:
+      description: Valid username
       type: string
-      example: jonhDoe
+      example: Maria
       pattern: 'ˆ.*?$'
       minLength: 3
       maxLength: 16
     UserList:
+      description: List of usernames
       type: object
       properties:
         nElements:
-          description: number of elements of the list
+          description: Number of elements of the list
           type: integer
           minimum: 0
         users:
+          description: List of usernames
           type: array
           minItems: 1
           maxItems: 200
           items: 
             type: string
-            example: jonhDoe
+            example: Maria
             pattern: 'ˆ.*?$'
             minLength: 3
-            maxLength: 16
-          
+            maxLength: 16     
     UserProfile:
+      description: Profile of a user
       type: object
       properties:
         username:
+          description: Username of user
           type: string
-          example: jonhDoe
-        name:
-          type: string
-          example: Jonh Doe
+          example: Maria
+          pattern: 'ˆ.*?$'
+          minLength: 3
+          maxLength: 16
         numberPosts:
-          description: number of posts
+          description: Number of posts
           type: integer
+          example: 3
         followers:
-          description: number of followers
+          description: Number of followers
           type: integer
+          example: 3
         following:
-          description: number of users followed
+          description: Number of users followed
           type: integer
+          example: 3
         isFollowed:
-          description: is the user followed by the authenticated user
+          description: Is the user followed by the authenticated user
           type: boolean
           default: false
         isBanned:
-          description: is the user banned by the authenticated user
+          description: Is the user banned by the authenticated user
           type: boolean
           default: false
         photos:
+          description: Photos uploaded by the user
           type: array
           items: {$ref: '#/components/schemas/Photo'}
     Photo:
+      description: Photo uploaded by a user
       type: object
       properties:
         photoId:
@@ -675,6 +686,7 @@ components:
           pattern: '.*'
           example: "sunny day at the beach"
     Comment:
+      description: Comment uploaded on a photo
       type: object
       properties:
         text:
