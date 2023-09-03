@@ -36,14 +36,19 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
+	responseData := utils.LoginResponse{
+		Identifier: userIdentifier,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	// Set the Bearer token
 	w.Header().Set("Authorization", "Bearer "+userIdentifier)
 	w.WriteHeader(http.StatusCreated)
 
 	// Return the user identifier in the response
-	responseData := utils.LoginResponse{
-		Identifier: userIdentifier,
+	err = json.NewEncoder(w).Encode(responseData)
+	if err != nil {
+		ctx.Logger.Printf("Error encoding JSON: %v\n", err)
+		http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
+		return
 	}
-	json.NewEncoder(w).Encode(responseData)
 }

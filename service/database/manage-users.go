@@ -38,7 +38,7 @@ func (db *appdbimpl) GetUserProfile(username string, authUser string) (utils.Use
 	var up utils.UserProfile
 
 	// Plain simple SELECT to get user info on users table
-	err := db.c.QueryRow(`SELECT * FROM users WHERE username=?`, username).Scan(
+	err := db.c.QueryRow(`SELECT username, userId FROM users WHERE username=?`, username).Scan(
 		&up.Username, &up.UserId)
 	if err == sql.ErrNoRows {
 		return utils.UserProfile{}, ErrUserDoesNotExist
@@ -88,10 +88,11 @@ func (db *appdbimpl) GetUserProfile(username string, authUser string) (utils.Use
 func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, error) {
 	var ret []string
 
+	searchQuery = "%" + searchQuery + "%"
 	// Simple SELECT query to get matches that aren't banned by the authenticated user
 	rows, err := db.c.Query(`
 		SELECT username FROM users  
-		WHERE username LIKE '%' || ? || '%'
+		WHERE username LIKE ?
 		AND username NOT IN (
 			SELECT bannedUser FROM bans 
 			WHERE bannedUser = username 
@@ -100,7 +101,8 @@ func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, 
 			SELECT authUser FROM bans 
 			WHERE authUser = username 
 			AND bannedUser=?
-		)`, searchQuery, authUser, authUser)
+		AND username != ?
+		)`, searchQuery, authUser, authUser, authUser)
 	if err != nil {
 		return nil, err
 	}

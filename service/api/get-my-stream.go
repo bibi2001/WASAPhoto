@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 
@@ -20,6 +21,10 @@ func (rt *_router) GetMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Get the username corresponding to the Token
 	authUser, err := rt.db.GetUsername(token)
+	if err == sql.ErrNoRows {
+		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
+		return
+	}
 	if err != nil {
 		ctx.Logger.WithError(err).Error("authenticated username cannot be found")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

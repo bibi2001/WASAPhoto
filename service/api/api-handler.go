@@ -8,7 +8,7 @@ import (
 func (rt *_router) Handler() http.Handler {
 
 	// Login
-	rt.router.GET("/session/", rt.wrap(rt.Login))
+	rt.router.POST("/session", rt.wrap(rt.Login))
 
 	// Stream
 	rt.router.GET("/home", rt.wrap(rt.GetMyStream))
