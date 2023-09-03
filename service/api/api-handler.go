@@ -15,19 +15,19 @@ func (rt *_router) Handler() http.Handler {
 
 	// Users
 	rt.router.GET("/users/search", rt.wrap(rt.SearchUsers))
-	rt.router.GET("/users/:username", rt.wrap(rt.GetUserProfile))
-	rt.router.PUT("/users/:username/username", rt.wrap(rt.SetMyUsername))
+	rt.router.GET("/user/:username", rt.wrap(rt.GetUserProfile))
+	rt.router.PUT("/user/:username/username", rt.wrap(rt.SetMyUsername))
 
 	// Follows
-	rt.router.GET("/users/:username/following", rt.wrap(rt.ListFollowing))
-	rt.router.GET("/users/:username/followers", rt.wrap(rt.ListFollowers))
-	rt.router.PUT("/users/:username/followers/:authUser", rt.wrap(rt.FollowUnfollow))
-	rt.router.DELETE("/users/:username/followers/:authUser", rt.wrap(rt.FollowUnfollow))
+	rt.router.GET("/user/:username/following", rt.wrap(rt.ListFollowing))
+	rt.router.GET("/user/:username/followers", rt.wrap(rt.ListFollowers))
+	rt.router.PUT("/user/:username/followers/:authUser", rt.wrap(rt.FollowUnfollow))
+	rt.router.DELETE("/user/:username/followers/:authUser", rt.wrap(rt.FollowUnfollow))
 
 	// Bans
-	rt.router.GET("/users/:username/bans", rt.wrap(rt.ListBans))
-	rt.router.PUT("/users/:username/bans/:bannedUser", rt.wrap(rt.BanUnban))
-	rt.router.DELETE("/users/:username/bans/:bannedUser", rt.wrap(rt.BanUnban))
+	rt.router.GET("/user/:username/bans", rt.wrap(rt.ListBans))
+	rt.router.PUT("/user/:username/bans/:bannedUser", rt.wrap(rt.BanUnban))
+	rt.router.DELETE("/user/:username/bans/:bannedUser", rt.wrap(rt.BanUnban))
 
 	// Photos
 	rt.router.POST("/photo", rt.wrap(rt.UploadPhoto))

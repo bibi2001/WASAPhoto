@@ -108,7 +108,7 @@ paths:
       security:
       - bearerAuth: []
     
-  /users/{username}:
+  /user/{username}:
     parameters:
       - $ref: "#/components/parameters/username"
     get:
@@ -133,7 +133,7 @@ paths:
       security:
       - bearerAuth: []
 
-  /users/{username}/username:
+  /user/{username}/username:
     parameters:
       - $ref: "#/components/parameters/username"
     put:
@@ -163,7 +163,7 @@ paths:
       security:
       - bearerAuth: []
 
-  /users/{username}/following:
+  /user/{username}/following:
     parameters:
       - $ref: "#/components/parameters/username"
     get:
@@ -190,7 +190,7 @@ paths:
       security:
       - bearerAuth: []
 
-  /users/{username}/followers:
+  /user/{username}/followers:
     parameters:
       - $ref: "#/components/parameters/username"
     get:
@@ -216,7 +216,7 @@ paths:
           description: Photo not found
       security:
       - bearerAuth: []
-  /users/{username}/followers/{authUser}:
+  /user/{username}/followers/{authUser}:
     parameters:
       - $ref: "#/components/parameters/username"
       - name: authUser
@@ -269,7 +269,7 @@ paths:
       security:
       - bearerAuth: []
   
-  /users/{username}/bans:
+  /user/{username}/bans:
     parameters:
       - $ref: "#/components/parameters/username"
     get:
@@ -298,7 +298,7 @@ paths:
       security:
       - bearerAuth: [] 
 
-  /users/{username}/bans/{bannedUser}:
+  /user/{username}/bans/{bannedUser}:
     parameters:
       - $ref: "#/components/parameters/username"
       - name: bannedUser
