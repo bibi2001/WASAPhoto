@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
@@ -21,7 +22,7 @@ func (rt *_router) GetMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Get the username corresponding to the Token
 	authUser, err := rt.db.GetUsername(token)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
 	}

@@ -40,7 +40,7 @@ func (db *appdbimpl) GetUserProfile(username string, authUser string) (utils.Use
 	// Plain simple SELECT to get user info on users table
 	err := db.c.QueryRow(`SELECT username, userId FROM users WHERE username=?`, username).Scan(
 		&up.Username, &up.UserId)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return utils.UserProfile{}, ErrUserDoesNotExist
 	} else if err != nil {
 		return utils.UserProfile{}, err

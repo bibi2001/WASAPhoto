@@ -52,7 +52,7 @@ func (db *appdbimpl) GetPhoto(username string, photoId int64) (utils.Photo, erro
 	err := db.c.QueryRow(`SELECT photoId, image, username, date, caption 
 		FROM photos WHERE photoId=?`, photoId).Scan(
 		&p.PhotoId, &p.Image, &p.Username, &p.Date, &p.Caption)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return utils.Photo{}, ErrPhotoDoesNotExist
 	}
 	if err != nil {
