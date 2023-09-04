@@ -104,7 +104,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "users" (
-			"userId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			"userId"	INTEGER PRIMARY KEY AUTOINCREMENT,
 			"username"	TEXT NOT NULL UNIQUE
 		);`
 		_, err = db.Exec(sqlStmt)
@@ -116,7 +116,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='photos';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "photos" (
-			"photoId"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			"photoId"	INTEGER PRIMARY KEY AUTOINCREMENT,
 			"image" 	BLOB NOT NULL,
 			"username"	TEXT NOT NULL,
 			"date"		DATETIME NOT NULL,

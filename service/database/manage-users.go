@@ -11,9 +11,10 @@ import (
 func (db *appdbimpl) CreateUser(username string) error {
 	_, err := db.c.Exec(`INSERT INTO users (userId, username) VALUES (NULL, ?)`, username)
 	// Check if username is unique
-	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-		return errors.New("username given is not original enough")
-	} else if err != nil {
+	if err != nil {
+		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
+			return errors.New("username given is not original enough")
+		}
 		return err
 	}
 
