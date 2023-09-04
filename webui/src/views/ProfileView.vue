@@ -1,11 +1,15 @@
 <script>
-import { getAuthToken } from '../services/tokenService';
-
 export default {
 	data: function() {
 		return {
 			errormsg: null,
 			loading: false,
+            username: "",
+            userId: -1,
+            nPosts: 0,
+            nFollowers: 0,
+            isFollowed: false,
+            isBanned: false,
 			photos: [],
 		}
 	},
@@ -17,9 +21,10 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				let response = await this.$axios.get("/stream/", { headers: {
-				'Authorization': `Bearer ${getAuthToken}` ,
+				await this.$axios.get("/user/", { headers: {
+				'Authorization': `Bearer ${getAuthToken()}` ,
 				},
+                
 			});
 				this.photos = response.data;
 			} catch (e) {

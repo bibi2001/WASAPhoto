@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 </script>
+
 <script>
 export default {}
 </script>
@@ -20,27 +21,9 @@ export default {}
 				<div class="position-sticky pt-3 sidebar-sticky">
 					<ul class="nav flex-column">
 						<li class="nav-item">
-							<RouterLink to="/" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
-								Home
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink to="/search" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#search"/></svg>
-								Search
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink to="/create-post" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#plus-square"/></svg>
-								Create
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink :to="'/profile' + 'username' + '/path'" class="nav-link">
+							<RouterLink :to="'/login'" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
-								Profile
+								Login
 							</RouterLink>
 						</li>
 					</ul>
