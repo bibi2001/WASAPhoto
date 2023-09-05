@@ -1,4 +1,4 @@
-let authToken = 1;
+let authToken = 0;
 
 export function setAuthToken(token) { authToken = token; }
 

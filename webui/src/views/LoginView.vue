@@ -1,5 +1,5 @@
 <script>
-import { setAuthToken } from '../services/tokenService';
+import { setAuthToken , getAuthToken} from '../services/tokenService';
 
 export default {
 	data: function () {
@@ -22,6 +22,9 @@ export default {
 
 				if (response.status == 201) {
 					setAuthToken(response.data["identifier"])
+
+					// Log the received Authorization header
+					console.log("Received Authorization Header:", getAuthToken());
 				}
 				this.$router.push("/");
 
