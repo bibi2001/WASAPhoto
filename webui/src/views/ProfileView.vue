@@ -44,7 +44,7 @@ export default {
 	<div>
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Your feed</h1>
+			<h1 class="h2">User Profile</h1>
 			<div class="btn-toolbar mb-2 mb-md-0">
 				<div class="btn-group me-2">
 					<button type="button" class="btn btn-sm btn-outline-secondary" @click="refresh">
@@ -64,11 +64,7 @@ export default {
 			</div>
 		</div>
 
-		<div class="card" v-if="!loading" v-for="p in photos">
-			<div class="card-header">
-				<Post v-bind:id="p.photoId" :pid="p.photoId"/>
-			</div>
-		</div>
+		
 	</div>
 </template>
 
