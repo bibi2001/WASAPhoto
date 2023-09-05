@@ -17,9 +17,10 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				await this.$axios.get("/home", {
-					headers: { Authorization: `Bearer 1` },
+				const response = await this.$axios.get("/home", {
+  					headers: { Authorization: `Bearer ${getAuthToken()}`}
 				});
+				console.log(response)
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
