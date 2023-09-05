@@ -1,38 +1,58 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-</script>
-
 <script>
-export default {}
+import { setAuthToken } from '../services/tokenService';
+
+export default {
+	data: function () {
+		return {
+			errormsg: null,
+			loading: false,
+			
+			// field 
+			username: "",
+		}
+	},
+	methods: {
+		async login () {
+			this.loading = true;
+			this.errormsg = null;
+			try {
+				const response = await this.$axios.post("/session", {
+					name: this.username,
+				});
+
+				if (response.status == 201) {
+					setAuthToken(response.data["identifier"])
+				}
+				this.$router.push("/");
+
+			} catch (e) {
+				this.errormsg = e.toString();
+			}
+			this.loading = false;
+		}
+	}
+}
 </script>
 
 <template>
+	<div>
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">Login</h1>
+		</div>
 
-	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-		<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAPhoto</a>
-		<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-	</header>
+		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
-	<div class="container-fluid">
-		<div class="row">
-			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-				<div class="position-sticky pt-3 sidebar-sticky">
-					<ul class="nav flex-column">
-						<li class="nav-item">
-							<RouterLink :to="'/login'" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
-								Login
-							</RouterLink>
-						</li>
-					</ul>
-				</div>
-			</nav>
+		<div class="mb-3">
+			<label for="description" class="form-label">Username</label>
+			<input type="string" class="form-control" id="username" v-model="username" placeholder="yourusername">
+		</div>
 
-			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-				<RouterView />
-			</main>
+		<div>
+			<button v-if="!loading" type="button" class="btn btn-primary" @click="login">
+				SIGN IN
+			</button>
+			<LoadingSpinner v-if="loading"></LoadingSpinner>
 		</div>
 	</div>
 </template>

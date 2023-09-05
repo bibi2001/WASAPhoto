@@ -21,11 +21,9 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				await this.$axios.get("/user/", { headers: {
-				'Authorization': `Bearer ${getAuthToken()}` ,
-				},
-                
-			});
+				const response = await this.$axios.get("/user/", { 
+					headers: { 'Authorization': `Bearer ${getAuthToken()}`}
+                });
 				this.photos = response.data;
 			} catch (e) {
 				this.errormsg = e.toString();

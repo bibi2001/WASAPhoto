@@ -17,19 +17,15 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				let response = await this.$axios.get("/stream/", { headers: {
-				'Authorization': `Bearer ${getAuthToken}` ,
-				},
-			});
-				this.photos = response.data;
+				await this.$axios.get("/home", {
+					headers: { Authorization: `Bearer 1` },
+				});
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
 			this.loading = false;
 		},
-		async newItem() {
-			this.$router.push("/new");
-		}
+
 	},
 	mounted() {
 		this.refresh()
@@ -61,11 +57,6 @@ export default {
 			</div>
 		</div>
 
-		<div class="card" v-if="!loading" v-for="p in photos">
-			<div class="card-header">
-				<Post v-bind:id="p.photoId" :pid="p.photoId"/>
-			</div>
-		</div>
 	</div>
 </template>
 
