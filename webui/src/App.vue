@@ -13,7 +13,7 @@
 			<div class="position-sticky pt-3 sidebar-sticky">
 			  <ul class="nav flex-column">
 				<li class="nav-item">
-				  <RouterLink to="/Login" class="nav-link">
+				  <RouterLink to="/login" class="nav-link">
 					<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
 					Temp Login
 				  </RouterLink>
@@ -25,7 +25,7 @@
 				  </RouterLink>
 				</li>
 				<li class="nav-item">
-				  <RouterLink to="/create-post" class="nav-link">
+				  <RouterLink to="/new" class="nav-link">
 					<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#plus-square"/></svg>
 					Create
 				  </RouterLink>

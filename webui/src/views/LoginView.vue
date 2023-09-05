@@ -51,13 +51,13 @@ export default {
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
 		<div class="mb-3">
-			<label for="description" class="form-label">Username</label>
+			<label for="description" class="form-label">Try to remember your username!</label>
 			<input type="string" class="form-control" id="username" v-model="username" placeholder="yourusername">
 		</div>
 
 		<div>
 			<button v-if="!loading" type="button" class="btn btn-primary" @click="login">
-				SIGN IN
+				Sign in
 			</button>
 			<LoadingSpinner v-if="loading"></LoadingSpinner>
 		</div>
