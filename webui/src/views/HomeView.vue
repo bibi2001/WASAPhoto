@@ -18,9 +18,11 @@ export default {
 			this.errormsg = null;
 			try {
 				const response = await this.$axios.get("/home", {
-  					headers: { Authorization: `Bearer ${getAuthToken()}`}
+  					headers: { Authorization: `Bearer ${30}`}
 				});
 				console.log(response)
+				if (response.status == 401)
+					this.errormsg = "You are not signed in yet"
 			} catch (e) {
 				this.errormsg = e.toString();
 			}

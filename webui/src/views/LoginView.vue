@@ -23,13 +23,17 @@ export default {
 				if (response.status == 201) {
 					setAuthToken(response.data["identifier"])
 
-					// Log the received Authorization header
+					// Debug 
 					console.log("Received Authorization Header:", getAuthToken());
+
+					this.$router.push("/");
 				}
-				this.$router.push("/");
 
 			} catch (e) {
-				this.errormsg = e.toString();
+				if (response.status == 400)
+					this.errormsg = "The username has to be between 3 and 16 characters long"
+				else
+					this.errormsg = e.toString();
 			}
 			this.loading = false;
 		}
