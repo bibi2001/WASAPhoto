@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
@@ -118,8 +117,6 @@ func (rt *_router) SearchUsers(w http.ResponseWriter, r *http.Request, ps httpro
 	// Read the photoId from the parameters
 	query := r.URL.Query().Get("q")
 
-	// Print the query variable for debugging purposes
-	fmt.Println("Search query:", query)
 	// Get the Bearer Token in the header
 	token, err := utils.GetBearerToken(r)
 	if err != nil {
