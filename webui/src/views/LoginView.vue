@@ -7,10 +7,10 @@ export default {
 			errormsg: null,
 			loading: false,
 			
-			// field 
 			username: "",
 		}
-	},
+	},  
+	
 	methods: {
 		async login () {
 			this.loading = true;
@@ -29,6 +29,15 @@ export default {
 					console.log("Received Username:", getAuthUsername());
 
 					this.$router.push("/home");
+				}
+
+				if (response.status == 400) {
+
+					// Debug 
+					console.log("Received Authorization Header:", getAuthToken());
+					console.log("Received Username:", getAuthUsername());
+
+					this.$router.push("/");
 				}
 
 			} catch (e) {

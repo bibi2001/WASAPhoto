@@ -40,7 +40,7 @@ export default {
             	this.isFollowed = response.data.isFollowed;
             	this.isBanned = response.data.isbanned;
 				this.photos = response.data.photos;
-				if (this.userId == getAuthToken()) { this.isOwner = true; }
+				this.isOwner = this.userId === getAuthToken();
 				
 			} catch (e) {
 				this.errormsg = e.toString();
@@ -84,7 +84,29 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				await this.$axios.put("/user/" + this.username + "/followers" + getAuthUsername());
+				if (this.isFollowed) {
+					await this.$axios.delete("/user/" + this.username + "/followers" + getAuthUsername());
+					this.isFollowed = false;
+				} else{ 
+					await this.$axios.put("/user/" + this.username + "/followers" + getAuthUsername());
+					this.isFollowed = true;
+				}
+			} catch (e) {
+				this.errormsg = e.toString();
+			}
+			this.loading = false;
+		},
+		async banUnbanBtn() {
+			this.loading = true;
+			this.errormsg = null;
+			try {
+				if (this.isBanned){
+					await this.$axios.delete("/user/" + this.username + "/bans" + getAuthUsername());
+					this.isBanned = false;
+				}else{
+					await this.$axios.put("/user/" + this.username + "/bans" + getAuthUsername());
+					this.isBanned = true;
+				}
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
@@ -108,6 +130,7 @@ export default {
 						Refresh
 					</button>
 				</div>
+				
 			</div>
 		</div>
 
@@ -115,24 +138,37 @@ export default {
 
 		<LoadingSpinner v-if="loading"></LoadingSpinner>
 
-		<div class="d-flex flex-column align-items-start">
+		<div class="d-flex align-items-center">
 			<h1 class="h2">{{ username }}</h1>
-			<div class="d-flex">
-				<p class="me-4">{{ nPosts }} Posts</p>
-				<p class="me-4">{{ nFollowers }} Followers</p>
-				<p>{{ nFollowing }} Following</p>
+				<div class="ms-5">
+					<div class="btn-group me-4">
+						<button type="button" class="btn btn-sm btn-outline-secondary" @click="followUnfollowBtn">
+							Follow
+						</button>
+					</div>
+				</div>
+				<div class="ms-0">
+					<button type="button" class="btn btn-sm btn-outline-secondary" @click="banUnbanBtn">
+						Block
+					</button>
+				</div>
 			</div>
+		<div class="d-flex">
+			<p class="me-5">{{ nPosts }} Posts</p>
+			<p class="me-5">{{ nFollowers }} Followers</p>
+			<p>{{ nFollowing }} Following</p>
 		</div>
-
-
-		<div class="card" v-if="!photos">
-			<div class="card-body">
-				<p>No photos to show.</p>
-			</div>
-		</div>
-
-		
-	</div>
+        <div v-if="photos.length">
+            <div v-for="photo in photos" :key="photo.id">
+                <photo :photoId="photo.id"></photo>
+            </div>
+        </div>
+        <div class="card" v-else>
+            <div class="card-body">
+                <p>No photos to show.</p>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style scoped>

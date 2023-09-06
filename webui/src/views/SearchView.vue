@@ -7,7 +7,7 @@ export default {
       errormsg: null,
       loading: false,
       query: "",
-      usernames: [], 
+      usernames: [],
     }
   },
   methods: {
@@ -18,6 +18,7 @@ export default {
         const response = await this.$axios.get("/users/search?q=" + this.query, {
           headers: { Authorization: `Bearer ${getAuthToken()}` }
         });
+        console.log(response.data)
         this.usernames = response.data; 
       } catch (e) {
         this.errormsg = e.toString();
@@ -38,18 +39,12 @@ export default {
 
 	<div class="mb-3">
 		<label for="description" class="form-label"> Look someone up!</label>
-		<input type="string" class="form-control" id="query" v-model="query" placeholder="username">
-	</div>
-
-	<div>
-		<button v-if="!loading" type="button" class="btn btn-primary" @click="search">
-            Go
-        </button>
+		<input type="string" class="form-control" id="query" v-model="query" placeholder="username" @input="search">
 	</div>
    
     <LoadingSpinner v-if="loading"></LoadingSpinner>
 
-    <div class="card" v-if="usernames.length === 0">
+    <div class="card" v-if="!usernames">
       <div class="card-body">
         <p>No users match.</p>
       </div>

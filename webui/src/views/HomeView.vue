@@ -20,7 +20,7 @@ export default {
 				const response = await this.$axios.get("/home", {
   					headers: { Authorization: `Bearer ${getAuthToken()}`}
 				});
-				// console.log(response)
+				this.photos = response
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
@@ -52,7 +52,7 @@ export default {
 
 		<LoadingSpinner v-if="loading"></LoadingSpinner>
 
-		<div class="card" v-if="photos.length === 0">
+		<div class="card" v-if="photos">
 			<div class="card-body">
 				<p>No photos to show.</p>
 			</div>
