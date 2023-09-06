@@ -8,10 +8,10 @@ import ProfileView from '../views/ProfileView.vue'
 const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
 	routes: [
-		{path: '/', component: HomeView},
-		{path: '/login', component: LoginView},
+		{path: '/', component: LoginView},
+		{path: '/home', component: HomeView},
 		{path: '/search', component: SearchView},
-		{path: '/:username', component: ProfileView},
+		{path: '/profile/:username', component: ProfileView},
 	]
 })
 

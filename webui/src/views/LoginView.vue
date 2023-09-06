@@ -1,5 +1,5 @@
 <script>
-import { setAuthToken , getAuthToken} from '../services/tokenService';
+import { setAuthToken , getAuthToken, setAuthUsername, getAuthUsername} from '../services/tokenService';
 
 export default {
 	data: function () {
@@ -21,12 +21,14 @@ export default {
 				});
 
 				if (response.status == 201) {
-					setAuthToken(response.data["identifier"])
+					setAuthToken(response.data["identifier"]);
+					setAuthUsername(this.username);
 
 					// Debug 
 					console.log("Received Authorization Header:", getAuthToken());
+					console.log("Received Username:", getAuthUsername());
 
-					this.$router.push("/");
+					this.$router.push("/home");
 				}
 
 			} catch (e) {
