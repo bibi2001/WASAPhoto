@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
-	"github.com/bibi2001/WASAPhoto/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -35,25 +34,6 @@ func (rt *_router) FollowUnfollow(w http.ResponseWriter, r *http.Request, ps htt
 		// Here we validate the username, and we
 		// discovered that it is not valid.
 		http.Error(w, "Invalid Username", http.StatusBadRequest)
-		return
-	}
-
-	// Get the Bearer Token in the header
-	token, err := utils.GetBearerToken(r)
-	if err != nil {
-		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
-		return
-	}
-	// Get the username corresponding to the Token
-	authUsername, err := rt.db.GetUsername(token)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("authenticated username can not be found")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	if authUser != authUsername {
-		http.Error(w, "Authenticated userID doesn't match authenticated username",
-			http.StatusUnauthorized)
 		return
 	}
 
