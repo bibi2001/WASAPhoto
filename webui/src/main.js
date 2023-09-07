@@ -7,7 +7,6 @@ import LoadingSpinner from './components/LoadingSpinner.vue'
 import UserList from './components/UserList.vue'
 import Photo from './components/Photo.vue'
 import Comment from './components/Comment.vue'
-import Modal from './components/Modal.vue'
 
 import './assets/dashboard.css'
 import './assets/main.css'
@@ -19,6 +18,5 @@ app.component("LoadingSpinner", LoadingSpinner);
 app.component("UserList", UserList);
 app.component("Photo", Photo);
 app.component("Comment", Comment);
-app.component("Modal", Modal);
 app.use(router)
 app.mount('#app')
