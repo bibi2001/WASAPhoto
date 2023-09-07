@@ -18,7 +18,7 @@ export default {
         const response = await this.$axios.get("/users/search?q=" + this.query, {
           headers: { Authorization: `Bearer ${getAuthToken()}` }
         });
-        console.log(response.data)
+        console.log(response.data);
         this.usernames = response.data; 
       } catch (e) {
         this.errormsg = e.toString();
@@ -44,11 +44,17 @@ export default {
    
     <LoadingSpinner v-if="loading"></LoadingSpinner>
 
-    <div class="card" v-if="!usernames">
-      <div class="card-body">
-        <p>No users match.</p>
+
+    <div v-if="usernames">
+      <div v-for="username in usernames" :key="username">
+        <UserList :username="username"></UserList>
       </div>
     </div>
+        <div class="card" v-else>
+            <div class="card-body">
+              <p>No users match.</p>
+            </div>
+        </div>
   </div>
 </template>
 
