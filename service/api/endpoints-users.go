@@ -78,27 +78,7 @@ func (rt *_router) SetMyUsername(w http.ResponseWriter, r *http.Request, ps http
 
 	// Check if the new username is different from the old one
 	if oldUsername == newUsername {
-		http.Error(w, "New username cannot match old username", http.StatusUnauthorized)
-		return
-	}
-
-	// Get the Bearer Token from the request header
-	token, err := utils.GetBearerToken(r)
-	if err != nil {
-		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
-		return
-	}
-	// Get the username corresponding to the Token
-	authUsername, err := rt.db.GetUsername(token)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("authenticated username cannot be found")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	// Check if the user trying to change the username is authorized to do so
-	if authUsername != oldUsername {
-		http.Error(w, "Only the owner of the profile can edit the username", http.StatusUnauthorized)
+		http.Error(w, "New username cannot match old username", http.StatusBadRequest)
 		return
 	}
 

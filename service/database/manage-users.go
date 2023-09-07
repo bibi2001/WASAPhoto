@@ -22,12 +22,19 @@ func (db *appdbimpl) CreateUser(username string) error {
 }
 
 func (db *appdbimpl) UpdateUsername(oldUsername string, newUsername string) error {
-	_, err := db.c.Exec(`UPDATE users SET username=? WHERE username=?`, newUsername, oldUsername)
-	// Check if username is unique
-	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-		return errors.New("username given is not original enough")
-	} else if err != nil {
+	result, err := db.c.Exec(`UPDATE users SET username=? WHERE username=?`, newUsername, oldUsername)
+
+	if err != nil {
+		return err // Handle the general database error.
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
 		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("username not found")
 	}
 
 	return nil
