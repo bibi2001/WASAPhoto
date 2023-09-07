@@ -7,7 +7,7 @@ import (
 )
 
 func (db *appdbimpl) CommentPhoto(username string, photoId int64, text string) (utils.Comment, error) {
-	res, err := db.c.Exec(`INSERT INTO comments (id, photoId, username, text) VALUES (NULL, ?, ?, ?)`,
+	res, err := db.c.Exec(`INSERT INTO comments (commentId, photoId, username, text) VALUES (NULL, ?, ?, ?)`,
 		photoId, username, text)
 	if err != nil {
 		return utils.Comment{}, err
