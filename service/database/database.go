@@ -61,7 +61,7 @@ type AppDatabase interface {
 	UnlikePhoto(username string, photoId int64) error
 	ListLikes(photoId int64) ([]string, error)
 
-	UploadPhoto(username string, caption string, image []byte) (utils.Photo, error)
+	UploadPhoto(username string, caption string) (utils.Photo, error)
 	DeletePhoto(photoId int64) error
 	GetPhoto(username string, photoId int64) (utils.Photo, error)
 	ListUserPhotos(username string) ([]utils.Photo, error)
@@ -117,7 +117,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "photos" (
 			"photoId"	INTEGER PRIMARY KEY AUTOINCREMENT,
-			"image" 	BLOB NOT NULL,
 			"username"	TEXT NOT NULL,
 			"date"		DATETIME NOT NULL,
 			"caption"	TEXT,

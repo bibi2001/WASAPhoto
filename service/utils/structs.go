@@ -17,7 +17,6 @@ type Comment struct {
 type Photo struct {
 	PhotoId   int64     `json:"photoId"`
 	Username  string    `json:"username"`
-	Image     []byte    `json:"image"`
 	Date      time.Time `json:"date"`
 	Caption   string    `json:"caption"`
 	NComments int64     `json:"nComments"`

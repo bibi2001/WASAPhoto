@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
 	"github.com/bibi2001/WASAPhoto/service/utils"
@@ -39,7 +41,6 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
 		return
 	}
-
 	// Get the username corresponding to the Token
 	authUser, err := rt.db.GetUsername(token)
 	if err != nil {
@@ -48,10 +49,30 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Upload the photo
-	photo, err := rt.db.UploadPhoto(authUser, caption, imageBytes)
+	// Upload the photo to the database
+	photo, err := rt.db.UploadPhoto(authUser, caption)
 	if err != nil {
-		ctx.Logger.WithError(err).Error("can't upload photo")
+		ctx.Logger.WithError(err).Error("can't upload photo to database")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Define the file path where we'll save the image
+	filePath := "./storage/" + strconv.FormatInt(photo.PhotoId, 10) + ".jpg"
+
+	// Create or open the file for writing
+	file, err := os.Create(filePath)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("can't create file for photo")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	// Write the image bytes to the file
+	_, err = file.Write(imageBytes)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("can't write image data to file")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

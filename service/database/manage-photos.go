@@ -8,11 +8,11 @@ import (
 	"github.com/bibi2001/WASAPhoto/service/utils"
 )
 
-func (db *appdbimpl) UploadPhoto(username string, caption string, image []byte) (utils.Photo, error) {
+func (db *appdbimpl) UploadPhoto(username string, caption string) (utils.Photo, error) {
 	t := globaltime.Now()
 
-	res, err := db.c.Exec(`INSERT INTO photos (photoId, image, username, date, caption) 
-		VALUES (NULL, ?, ?, ?, ?)`, image, username, t, caption)
+	res, err := db.c.Exec(`INSERT INTO photos (photoId, username, date, caption) 
+		VALUES (NULL, ?, ?, ?)`, username, t, caption)
 	if err != nil {
 		return utils.Photo{}, err
 	}
@@ -22,7 +22,7 @@ func (db *appdbimpl) UploadPhoto(username string, caption string, image []byte) 
 		return utils.Photo{}, err
 	}
 
-	p := utils.Photo{PhotoId: int64(lastInsertID), Image: image, Username: username,
+	p := utils.Photo{PhotoId: int64(lastInsertID), Username: username,
 		Date: t, Caption: caption, NComments: 0, NLikes: 0, IsLiked: false}
 	return p, nil
 }
@@ -49,9 +49,9 @@ func (db *appdbimpl) GetPhoto(username string, photoId int64) (utils.Photo, erro
 	var p utils.Photo
 
 	// Plain simple SELECT to get photo info on photos table
-	err := db.c.QueryRow(`SELECT photoId, image, username, date, caption 
+	err := db.c.QueryRow(`SELECT photoId, username, date, caption 
 		FROM photos WHERE photoId=?`, photoId).Scan(
-		&p.PhotoId, &p.Image, &p.Username, &p.Date, &p.Caption)
+		&p.PhotoId, &p.Username, &p.Date, &p.Caption)
 	if errors.Is(err, sql.ErrNoRows) {
 		return utils.Photo{}, ErrPhotoDoesNotExist
 	}
