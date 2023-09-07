@@ -89,12 +89,13 @@ export default {
 			this.errormsg = null;
 			try {
 				if (this.isFollowed) {
-					await this.$axios.delete("/user/" + this.photoId + "/likes" + getAuthUsername());
+					await this.$axios.delete("/user/" + this.photoId + "/likes/" + getAuthUsername());
 					this.isLikes = false;
 				} else{ 
-					await this.$axios.put("/user/" + this.photoId + "/likes" + getAuthUsername());
+					await this.$axios.put("/user/" + this.photoId + "/likes/" + getAuthUsername());
 					this.isLikes = true;
 				}
+				console.log("aaa")
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
@@ -120,45 +121,69 @@ export default {
 	}
 }
 </script>
-
 <template>
 	<div>
-
-		<LoadingSpinner v-if="loading"></LoadingSpinner>
-
-		<div class="d-flex align-items-center">
-			<h1 class="h2">{{ username }}</h1>
-				<div class="ms-5">
-					<div class="btn-group me-4">
-						<button type="button" class="btn btn-sm btn-outline-secondary" @click="followUnfollowBtn">
-							Follow
-						</button>
-					</div>
-				</div>
-				<div class="ms-0">
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="banUnbanBtn">
-						Block
-					</button>
-				</div>
-			</div>
-		<div class="d-flex">
-			<p class="me-5">{{ nPosts }} Posts</p>
-			<p class="me-5">{{ nFollowers }} Followers</p>
-			<p>{{ nFollowing }} Following</p>
-		</div>
-
-		<div class="card" v-if="!photos">
-			<div class="card-body">
-				<p>No photos to show.</p>
-			</div>
-		</div>
-
+	  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 		
+	  </div>
+  
+	  <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+  
+	  <div class="mb-3">
+		<div class="photo-container">
+		  <img :src="image" alt="Photo" class="img-fluid" />
+		</div>
+		<div class="photo-caption">
+		  <p>{{ caption }}</p>
+		</div>
+		<div class="photo-info">
+		  <p>Posted by {{ username }} on {{ date }}</p>
+		  <p>{{ nLikes }} Likes</p>
+		</div>
+	  </div>
+  
+	  <div class="photo-actions">
+		<button @click="likeUnlikeBtn" :disabled="loading" class="btn btn-primary">
+		  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#heart"/></svg>
+		  {{ isLiked ? 'Unlike' : 'Like' }}
+		</button>
+  
+		<button @click="showComments" :disabled="loading" class="btn btn-secondary">
+		  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#message-circle"/></svg>
+		  Show comments
+		</button>
+	  </div>
+  
 	</div>
-</template>
-
-<style scoped>
-.card {
-	margin-bottom: 20px;
-}
-</style>
+  </template>
+  
+  <style scoped>
+  .photo-container {
+	text-align: center;
+  }
+  
+  .photo-caption {
+	margin-top: 20px;
+  }
+  
+  .photo-info {
+	font-size: 14px;
+	color: #777;
+  }
+  
+  .photo-actions {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 20px;
+  }
+  
+  .btn {
+	display: flex;
+	align-items: center;
+  }
+  
+  .btn svg {
+	margin-right: 5px;
+  }
+  </style>
+  
