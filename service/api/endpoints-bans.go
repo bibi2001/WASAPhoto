@@ -38,25 +38,6 @@ func (rt *_router) BanUnban(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	// Get the Bearer Token in the header
-	token, err := utils.GetBearerToken(r)
-	if err != nil {
-		http.Error(w, "Invalid Bearer Token", http.StatusUnauthorized)
-		return
-	}
-	// Get the username corresponding to the Token
-	authUsername, err := rt.db.GetUsername(token)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("authenticated username can not be found")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	if authUser != authUsername {
-		http.Error(w, "Authenticated userID doesn't match authenticated username",
-			http.StatusUnauthorized)
-		return
-	}
-
 	// Check if we should ban or unban the user
 	if r.Method == http.MethodPut {
 		// Ban user
