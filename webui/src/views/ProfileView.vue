@@ -151,8 +151,8 @@ export default {
 
 
 		<div v-if="photos && !isBanned">
-			<div v-for="photo in photos" :key="photo.id">
-				<Photo :photoId="photo.id"></Photo>
+			<div v-for="photo in photos" :key="photo.photoId">
+				<Photo :photoId="photo.photoId"></Photo>
 			</div>
 		</div>
 		<div class="card" v-else>

@@ -10,7 +10,7 @@ export default {
 			loading: false,
             
 	        username: null,
-            image: 0,
+            imageURL: null,
             date: null,
             caption: null,
 
@@ -37,14 +37,15 @@ export default {
 					headers: { 'Authorization': `Bearer ${getAuthToken()}`}
                 });
 				this.username = response.data.username;
-            	this.image = response.data.image;
             	this.date = response.data.date;
 				this.caption = response.data.caption;
             	this.nComments = response.data.nComments;
             	this.nLikes = response.data.nLikes;
 				this.isLiked = response.data.isLiked;
                 this.isAuthor = this.username === getAuthUsername();
-				
+
+    			this.imageURL = `/storage/${this.photoId}.jpg`;
+				console.log(this.imageURL);
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
@@ -77,14 +78,15 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				if (this.isFollowed) {
+				if (this.isLiked) {
 					await this.$axios.delete("/photo/" + this.photoId + "/likes/" + getAuthUsername());
-					this.isLikes = false;
+					this.isLiked = false;
+					this.nLikes = this.nLikes - 1 ;
 				} else{ 
 					await this.$axios.put("/photo/" + this.photoId + "/likes/" + getAuthUsername());
-					this.isLikes = true;
+					this.isLiked = true;
+					this.nLikes = this.nLikes + 1 ;
 				}
-				console.log("aaa")
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
@@ -98,7 +100,7 @@ export default {
 					text: this.commentText, headers: { 'Authorization': `Bearer ${getAuthToken()}`}
 				});
 				await listComments();
-				
+				this.nComments = this.nComments + 1 ;
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
@@ -120,8 +122,7 @@ export default {
   
 	  <div class="mb-3">
 		<div class="photo-container">
-			<p>{{ image }}</p>
-		  <!-- <img :src="image" alt="Photo" class="img-fluid" /> -->
+			<img v-if="imageURL" :src="imageURL" alt="Photo" class="img-fluid" />
 		</div>
 		<div class="photo-caption">
 		  <p>{{ caption }}</p>
@@ -138,7 +139,7 @@ export default {
 		  {{ isLiked ? 'Unlike' : 'Like' }}
 		</button>
   
-		<button @click="showComments" :disabled="loading" class="btn btn-secondary">
+		<button @click="listComments" :disabled="loading" class="btn btn-secondary">
 		  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#message-circle"/></svg>
 		  Show comments
 		</button>
