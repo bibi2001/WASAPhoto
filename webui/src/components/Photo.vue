@@ -73,26 +73,15 @@ export default {
 			}
 			this.loading = false;
 		},
-		async listBans(){
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				const response = await this.$axios.get("/user/" + this.username + "/bans");
-				this.following = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
-		},
 		async likeUnlikeBtn() {
 			this.loading = true;
 			this.errormsg = null;
 			try {
 				if (this.isFollowed) {
-					await this.$axios.delete("/user/" + this.photoId + "/likes/" + getAuthUsername());
+					await this.$axios.delete("/photo/" + this.photoId + "/likes/" + getAuthUsername());
 					this.isLikes = false;
 				} else{ 
-					await this.$axios.put("/user/" + this.photoId + "/likes/" + getAuthUsername());
+					await this.$axios.put("/photo/" + this.photoId + "/likes/" + getAuthUsername());
 					this.isLikes = true;
 				}
 				console.log("aaa")
@@ -105,7 +94,7 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				await this.$axios.post("/user/" + this.photoId + "/comments", {
+				await this.$axios.post("/photo/" + this.photoId + "/comments", {
 					text: this.commentText, headers: { 'Authorization': `Bearer ${getAuthToken()}`}
 				});
 				await listComments();
@@ -131,7 +120,8 @@ export default {
   
 	  <div class="mb-3">
 		<div class="photo-container">
-		  <img :src="image" alt="Photo" class="img-fluid" />
+			<p>{{ image }}</p>
+		  <!-- <img :src="image" alt="Photo" class="img-fluid" /> -->
 		</div>
 		<div class="photo-caption">
 		  <p>{{ caption }}</p>
