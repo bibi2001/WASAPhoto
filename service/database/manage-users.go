@@ -109,7 +109,7 @@ func (db *appdbimpl) UserSearch(searchQuery string, authUser string) ([]string, 
 			SELECT authUser FROM bans 
 			WHERE authUser = username 
 			AND bannedUser=?
-		AND username != ?
+		AND username != "?"
 		)`, searchQuery, authUser, authUser, authUser)
 	if err != nil {
 		return nil, err
