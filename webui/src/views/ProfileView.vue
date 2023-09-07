@@ -16,10 +16,6 @@ export default {
             isBanned: false,
 			isAuth: false,
 			photos: [],
-
-			followers: [],
-			following: [],
-			bans: [],
 		}
 	},
 	methods: {
@@ -48,43 +44,16 @@ export default {
 			this.loading = false;
 		},
 		async listFollowers() {
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				const response = await this.$axios.get("/user/" + this.username + "/followers");
-				console.log(response.data);
-				this.followers = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
+			this.$router.push("/profile/"+this.username+"/followers");
 		},
 		async listFollowing() {
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				const response = await this.$axios.get("/user/" + this.username + "/following");
-				console.log(response.data);
-				this.following = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
+			this.$router.push("/profile/"+this.username+"/following");
 		},
 		async listBans(){
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				const response = await this.$axios.get("/user/" + this.username + "/bans", {
-					headers: { Authorization: `Bearer ${getAuthToken()}` }
-				});
-				console.log(response.data);
-				this.bans = response.data;
-				
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
+			this.$router.push("/profile/"+this.username+"/bans");
+		},
+		async changeUsername(){
+			this.$router.push("/profile/"+this.username+"/username");
 		},
 		async followUnfollowBtn() {
 			this.loading = true;
@@ -179,6 +148,8 @@ export default {
 		<p @click="listFollowing" style="cursor: pointer;"> 
 			{{ nFollowing }} Following</p>
 	  	</div>
+
+
 		<div v-if="photos && !isBanned">
 			<div v-for="photo in photos" :key="photo.id">
 				<Photo :photoId="photo.id"></Photo>
