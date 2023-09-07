@@ -28,12 +28,22 @@ export default {
 
         this.$router.push("/profile/" + this.newUsername);
       } catch (e) {
-        if (e.response && e.response.status === 400) {
-          this.errormsg = "The username has to be between 3 and 16 characters long";
-        } else {
-          this.errormsg = e.toString();
+          if (e.response && e.response.status === 400) {
+            if (this.newUsername.length < 3 || this.newUsername.length > 16) {
+              this.errormsg = "The username has to be between 3 and 16 characters long...";
+            } else if (this.newUsername === this.oldUsername) {
+              this.errormsg = "The username has to be different from your last one!";
+            } else {
+              const usernameRegex = /^[a-zA-Z0-9_]+$/;
+              if (!usernameRegex.test(this.newUsername)) {
+                this.errormsg = "The username has too many weird characters.";
+              }
+            }
+          } else {
+            this.errormsg = e.toString();
+          }
         }
-      }
+
       this.loading = false;
     }
   }
