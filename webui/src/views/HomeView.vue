@@ -53,8 +53,8 @@ export default {
 		<LoadingSpinner v-if="loading"></LoadingSpinner>
 
 		<div v-if="photos">
-			<div v-for="photo in photos" :key="photo.id">
-				<Photo :photoId="photo.id"></Photo>
+			<div v-for="photo in photos" :key="photo.photoId">
+				<Photo :photoId="photo.photoId"></Photo>
 			</div>
 		</div>
 		<div v-else>
