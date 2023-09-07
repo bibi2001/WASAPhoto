@@ -26,7 +26,7 @@ export default {
           },
         });
 
-        this.$router.push("/user/" + this.newUsername);
+        this.$router.push("/profile/" + this.newUsername);
       } catch (e) {
         if (e.response && e.response.status === 400) {
           this.errormsg = "The username has to be between 3 and 16 characters long";
