@@ -2,9 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/bibi2001/WASAPhoto/service/api/reqcontext"
@@ -62,6 +62,12 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	filePath := "./storage/" + strconv.FormatInt(photo.PhotoId, 10) + ".jpg"
 
 	// Create or open the file for writing
+	if err = os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
+		ctx.Logger.WithError(err).Error("can't create file for photo")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	file, err := os.Create(filePath)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("can't create file for photo")
@@ -162,8 +168,6 @@ func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Convert the file content to a string
 	dataURL := string(dataURLBytes)
-
-	fmt.Println(dataURL[0:30]) // Print the first 30 characters of the data URL
 
 	response := utils.PhotoResponse{
 		DataURL: dataURL,
