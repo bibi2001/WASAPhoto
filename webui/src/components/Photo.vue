@@ -2,6 +2,20 @@
 <script>
 import { getAuthToken, getAuthUsername } from '../services/tokenService';
 
+// Auxiliar function 
+function dataURLtoBlob(dataURL) {
+  const parts = dataURL.split(',');
+  const mimeType = parts[0].match(/:(.*?);/)[1];
+  const b64Data = atob(parts[1]);
+  const byteArray = new Uint8Array(b64Data.length);
+
+  for (let i = 0; i < b64Data.length; i++) {
+    byteArray[i] = b64Data.charCodeAt(i);
+  }
+
+  return new Blob([byteArray], { type: mimeType });
+}
+
 export default {
     props: ["photoId"],
 	data: function() {
@@ -37,17 +51,19 @@ export default {
 			try {
 				const response = await this.$axios.get("/photo/" + this.photoId, { 
 					headers: { 'Authorization': `Bearer ${getAuthToken()}`}
-                });
-				this.username = response.data.username;
-            	this.date = response.data.date;
-				this.caption = response.data.caption;
-            	this.nComments = response.data.nComments;
-            	this.nLikes = response.data.nLikes;
-				this.isLiked = response.data.isLiked;
+                },);
+				console.log(response.data);
+				this.username = response.data.photo.username;
+            	this.date = response.data.photo.date;
+				this.caption = response.data.photo.caption;
+            	this.nComments = response.data.photo.nComments;
+            	this.nLikes = response.data.photo.nLikes;
+				this.isLiked = response.data.photo.isLiked;
                 this.isAuthor = this.username === getAuthUsername();
+				
+				// Convert Blob to a data URL
+				this.imageURL = URL.createObjectURL(dataURLtoBlob(response.data.dataURL));
 
-    			this.imageURL = `/storage/${this.photoId}.jpg`;
-				console.log(this.imageURL);
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
@@ -58,13 +74,17 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				const response = await this.$axios.get("/photo/" + this.photoId + "/comments");
-				this.comments = response.data;
+				if (!this.showComments) {
+					const response = await this.$axios.get("/photo/" + this.photoId + "/comments");
+					this.comments = response.data;
+					this.showComments = true;
+				} else {
+					this.showComments = false
+				}
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
 			this.loading = false;
-			this.showComments = true
 		},
 		async listLikes() {
 			this.loading = true;
@@ -100,13 +120,13 @@ export default {
 			this.errormsg = null;
 			try {
 				await this.$axios.post("/photo/" + this.photoId +"/comments", {
-					text: this.textComment,}, {
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${getAuthToken()}`,
-					},
+					text: this.textComment}, {
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${getAuthToken()}`,
+						},
 					});
-				await listComments();
+				
 				this.nComments = this.nComments + 1 ;
 			} catch (e) {
 				this.errormsg = e.toString();
@@ -166,23 +186,26 @@ export default {
       <!-- Reduce the margin-left to make buttons closer together -->
       <button @click="listComments" :disabled="loading" class="btn btn-secondary" style="margin-left: 10px;">
         <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#message-circle"/></svg>
-        Show comments
+        {{ showComments ? 'Hide comments' : 'Show comments' }}
       </button>
     </div>
-  
-	  <div v-if="showComments">
-		<div v-if="comments">
-		  <div v-for="comment in comments" :key="comment.commentId">
-			<Comment :commentId="comment.commentId" photoId="this.photoId"></Comment>
-		  </div>
-		</div>
-  
-		<div class="mt-3">
-		  <label for="commentInput" class="form-label">Add a Comment</label>
-		  <input type="text" class="form-control" id="commentInput" v-model="this.commentText" placeholder="What do you have to comment?" />
-		  <button @click="commentBtn" :disabled="loading" class="btn btn-primary mt-2">Comment</button>
-		</div>
-	  </div>
+
+	<div v-if="showComments" class="mt-3">
+  <div v-if="comments">
+    <div v-for="comment in comments" :key="comment">
+      <Comment :comment="comment" photoId="this.photoId"></Comment>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <label for="commentInput" class="form-label">What do you have to comment?</label>
+    <div class="input-group">
+      <input type="text" class="form-control" id="commentInput" v-model="this.commentText" placeholder="Great photo!" />
+      <button @click="commentBtn" :disabled="loading" class="btn btn-primary">Comment</button>
+    </div>
+  </div>
+</div>
+
 	</div>
   </template>
   

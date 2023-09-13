@@ -41,6 +41,8 @@ export default {
             },
           });
 
+          console.log(imageData);
+
           this.$router.push("/home");
         };
 
@@ -70,10 +72,17 @@ export default {
     
     <input type="file" ref="fileInput" @change="onFileSelected" accept="image/*">
     <img v-if="selectedImage" :src="selectedImage" alt="Selected Image" />
-    <button @click="uploadImage">Upload Image</button>
+    
+    
+    <div class="mt-3">
+      <div class="input-group">
+        <input type="text" class="form-control" id="caption" v-model="this.caption" placeholder="write your caption here" />
+        <button @click="addCaption" :disabled="loading" class="btn btn-primary">OK</button>
+      </div>
+    <button class="mt-2" @click="uploadImage">Upload Image</button>
+  </div>
   </div>
 </template>
 
 <style scoped>
-/* Add your CSS styles here */
 </style>

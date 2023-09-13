@@ -38,3 +38,8 @@ type UserProfile struct {
 type LoginResponse struct {
 	Identifier string `json:"identifier"`
 }
+
+type PhotoResponse struct {
+	DataURL string `json:"dataURL"`
+	Photo   Photo  `json:"photo"`
+}

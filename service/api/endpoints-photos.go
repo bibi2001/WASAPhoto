@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -24,8 +25,8 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Get the image data from the JSON request
-	imageBytes := []byte(requestBody.Image)
+	// Get the data URL from the JSON request
+	dataURL := requestBody.Image
 
 	// Get the caption from the JSON request
 	caption := requestBody.Caption
@@ -69,10 +70,10 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	defer file.Close()
 
-	// Write the image bytes to the file
-	_, err = file.Write(imageBytes)
+	// Write the data URL string to the file
+	_, err = file.WriteString(dataURL)
 	if err != nil {
-		ctx.Logger.WithError(err).Error("can't write image data to file")
+		ctx.Logger.WithError(err).Error("can't write data URL to file")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -146,14 +147,31 @@ func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	// Get the photo from the database
 	photo, err := rt.db.GetPhoto(authUser, utils.ToInt64(photoId))
 	if err != nil {
-		ctx.Logger.WithError(err).Error("could not get user photo")
+		ctx.Logger.WithError(err).Error("could not get user photo information from database")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	// Return photo
+	// Read the file content
+	dataURLBytes, err := os.ReadFile("./storage/" + photoId + ".jpg")
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error reading photo image file")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Convert the file content to a string
+	dataURL := string(dataURLBytes)
+
+	fmt.Println(dataURL[0:30]) // Print the first 30 characters of the data URL
+
+	response := utils.PhotoResponse{
+		DataURL: dataURL,
+		Photo:   photo,
+	}
+
+	// Return photo info and photo URL
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(photo)
-
+	_ = json.NewEncoder(w).Encode(response)
 }
