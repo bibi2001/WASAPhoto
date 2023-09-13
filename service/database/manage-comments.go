@@ -73,7 +73,7 @@ func (db *appdbimpl) IsAuthor(username string, commentId int64) (bool, error) {
 
 	// Plain simple SELECT
 	err := db.c.QueryRow(`SELECT EXISTS (
-        SELECT 1 FROM photos WHERE username=? AND photoId = ?
+        SELECT 1 FROM comments WHERE username=? AND commentId = ?
     )`, username, commentId).Scan(&isAuthor)
 
 	if err != nil {

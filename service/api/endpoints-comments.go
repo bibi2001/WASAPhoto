@@ -84,7 +84,7 @@ func (rt *_router) UncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	} else if !isAuthor {
-		http.Error(w, "Authenticated user doesn't match comment's author",
+		http.Error(w, "Authenticated user doesn't match comment's author"+authUsername+" "+commentId,
 			http.StatusUnauthorized)
 		return
 	}
