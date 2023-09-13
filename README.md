@@ -1,9 +1,7 @@
-# Fountains!
+# WASAPhoto!
 
 This is an example of web application for [Web and Software Application](http://gamificationlab.uniroma1.it/en/wasa/)
 course.
-
-Beware that the features of uploading and viewing the photos are yet to be implemented, even though everything else is.
 
 ## How to build container images
 
