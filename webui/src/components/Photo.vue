@@ -52,7 +52,6 @@ export default {
 				const response = await this.$axios.get("/photo/" + this.photoId, { 
 					headers: { 'Authorization': `Bearer ${getAuthToken()}`}
                 },);
-				console.log(response.data);
 				this.username = response.data.photo.username;
             	this.date = response.data.photo.date;
 				this.caption = response.data.photo.caption;
@@ -120,14 +119,15 @@ export default {
 			this.errormsg = null;
 			try {
 				await this.$axios.post("/photo/" + this.photoId +"/comments", {
-					text: this.textComment}, {
+					text: this.commentText}, {
 						headers: {
 							'Content-Type': 'application/json',
 							'Authorization': `Bearer ${getAuthToken()}`,
 						},
 					});
 				
-				this.nComments = this.nComments + 1 ;
+				this.showComments = false;
+				this.nComments = this.nComments + 1;
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
@@ -167,12 +167,12 @@ export default {
 		<div class="photo-container">
 		  <img v-if="imageURL" :src="imageURL" alt="Photo" class="img-fluid" />
 		</div>
-		<div class="photo-caption">
-		  <p>{{ caption }}</p>
-		</div>
 		<div class="photo-info">
 		  <p>Posted by {{ username }} on {{ date }}</p>
 		  <p>{{ nLikes }} Likes {{ nComments }} Comments</p>
+		</div>
+		<div class="photo-caption">
+		  <p>{{ caption }}</p>
 		</div>
 	  </div>
   
@@ -191,17 +191,17 @@ export default {
     </div>
 
 	<div v-if="showComments" class="mt-3">
-  <div v-if="comments">
+  <div class="card" v-if="comments">
     <div v-for="comment in comments" :key="comment">
-      <Comment :comment="comment" photoId="this.photoId"></Comment>
+      <Comment :comment="comment" :photoId=this.photoId></Comment>
     </div>
   </div>
 
   <div class="mt-3">
-    <label for="commentInput" class="form-label">What do you have to comment?</label>
+    <label for="commentText" class="form-label">What do you have to comment?</label>
     <div class="input-group">
-      <input type="text" class="form-control" id="commentInput" v-model="this.commentText" placeholder="Great photo!" />
-      <button @click="commentBtn" :disabled="loading" class="btn btn-primary">Comment</button>
+        <input type="text" class="form-control" id="commentText" v-model="this.commentText" placeholder="Cool pic!" />
+      	<button @click="commentBtn" :disabled="loading" class="btn btn-primary">Comment</button>
     </div>
   </div>
 </div>
@@ -244,5 +244,13 @@ export default {
   .btn svg {
 	margin-right: 5px;
   }
+
+.username {
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: bold;
+	height: 0px;
+}
+  
   </style>
   

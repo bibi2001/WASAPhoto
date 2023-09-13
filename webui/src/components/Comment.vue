@@ -1,5 +1,5 @@
 <script>
-import { getAuthUsername } from '../services/tokenService';
+import { getAuthUsername, getAuthToken } from '../services/tokenService';
 export default {
     props: ["photoId","comment"],
 	data: function() {
@@ -7,27 +7,30 @@ export default {
 			errormsg: null,
 			loading: false,
 
+			commentPhotoId: this.photoId,
 			commentId: this.comment.commentId,
             username: this.comment.username,
     		text: this.comment.text,
+
 			isAuthor: this.comment.username === getAuthUsername(),
-    
+			isDeleted: false,
 		}
 	},
     methods: {
-		async goToProfile() {
+		goToProfile() {
 			this.$router.push("/profile/"+this.username);
 		},
 		async deleteBtn() {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				await this.$axios.delete("/photo/" + this.photoId +"/comments/" + this.commentId, {
+				await this.$axios.delete("/photo/" + this.commentPhotoId +"/comments/" + this.commentId, {
 					headers: { 'Authorization': `Bearer ${getAuthToken()}`}
 				});
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
+			this.isDeleted = true;
 			this.loading = false;
 		},
         
@@ -35,45 +38,45 @@ export default {
 
 }
 </script>
+
 <template>
-	<div class="card">
-	  <div class="card-body">
-		<p class="username" @click="goToProfile">{{ username }}</p>
-		<p class="text">{{ text }}</p>
-		<span v-if="isAuthor" @click="deleteBtn" class="delete-icon">
-		  <i data-feather="trash"></i>
-		</span>
-	  </div>
+	<div class="card-item" v-if="!this.isDeleted">
+		<a class="comment-delete" @click="deleteBtn" v-if="this.isAuthor">
+		  Delete this comment
+		</a>
+		<div class="card-title">
+			<p class="username" @click="goToProfile">{{ username }}</p>
+		</div>
+		<div class="card-text">
+			<p class="text">{{ text }}</p>
+	  	</div>
+
+		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 	</div>
-  </template>
+</template>
   
-  <style scoped>
-  .card {
-	margin-bottom: 10px;
-	padding: 10px; /* Add padding to the card body for spacing */
-	border: 1px solid #ddd; /* Add a border for separation */
-  }
+<style scoped>
+.card-item {
+	height: 50px;
+	-ms-wrap-margin: 10px;
+}
   
-  .username {
+.username {
 	cursor: pointer;
-	font-size: 10px;
-	margin-bottom: 3px;
-	color: #007bff; /* Change the username color to a more prominent color */
-	font-weight: bold; /* Make the username bold */
-  }
+	font-size: 13px;
+	font-weight: bold;
+	height: 0px;
+}
   
-  .text {
+.text {
+	font-size: 15px;
+}
+
+.comment-delete {
 	font-size: 12px;
-	color: #333; /* Darken the text color for better readability */
-	line-height: 1.4; /* Add line-height for better text spacing */
-  }
-  
-  /* Additional styling for the delete icon */
-  .delete-icon {
-	cursor: pointer;
-	float: right;
-	font-size: 14px;
 	color: #777;
+	cursor: pointer;
   }
-  </style>
+ 
+</style>
   

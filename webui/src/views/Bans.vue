@@ -18,7 +18,6 @@ export default {
         const response = await this.$axios.get("/user/" + this.username + "/bans", {
 					headers: { Authorization: `Bearer ${getAuthToken()}` }
 				});
-        console.log(response.data);
         this.bans = response.data;
       } catch (e) {
         this.errormsg = e.toString();

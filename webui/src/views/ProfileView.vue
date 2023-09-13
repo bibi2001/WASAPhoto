@@ -37,7 +37,6 @@ export default {
             	this.isBanned = response.data.isbanned;
 				this.photos = response.data.photos;
 				this.isOwner = this.userId === getAuthToken();
-				console.log(this.isOwner)
 			} catch (e) {
 				this.errormsg = e.toString();
 			}

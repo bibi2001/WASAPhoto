@@ -1,5 +1,5 @@
 <script>
-import { getAuthToken } from '../services/tokenService';
+import { getAuthToken, getAuthUsername } from '../services/tokenService';
 
 export default {
   data() {
@@ -17,6 +17,7 @@ export default {
       this.uploadFile = files[0]; // Store the selected file
     },
 
+
     async uploadImage() {
       if (!this.uploadFile) {
         // Check if no file selected
@@ -33,17 +34,14 @@ export default {
 
           await this.$axios.post("/photo", {
             image: imageData, 
-            caption: "caption!!",
+            caption: this.caption,
           }, {
             headers: {
               'Content-Type': 'application/json', // Set content type to JSON
               'Authorization': `Bearer ${getAuthToken()}`,
             },
           });
-
-          console.log(imageData);
-
-          this.$router.push("/home");
+          this.$router.push('/profile/'+getAuthUsername());
         };
 
         reader.readAsDataURL(this.uploadFile); // Read the file as a data URL
@@ -77,7 +75,6 @@ export default {
     <div class="mt-3">
       <div class="input-group">
         <input type="text" class="form-control" id="caption" v-model="this.caption" placeholder="write your caption here" />
-        <button @click="addCaption" :disabled="loading" class="btn btn-primary">OK</button>
       </div>
     <button class="mt-2" @click="uploadImage">Upload Image</button>
   </div>

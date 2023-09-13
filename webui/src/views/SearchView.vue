@@ -18,7 +18,6 @@ export default {
         const response = await this.$axios.get("/users/search?q=" + this.query, {
           headers: { Authorization: `Bearer ${getAuthToken()}` }
         });
-        console.log(response.data);
         this.usernames = response.data; 
       } catch (e) {
         this.errormsg = e.toString();

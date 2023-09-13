@@ -15,7 +15,6 @@ export default {
       this.errormsg = null;
       try {
         const response = await this.$axios.get("/user/" + this.username + "/followers");
-        console.log(response.data);
         this.followers = response.data;
       } catch (e) {
         this.errormsg = e.toString();
