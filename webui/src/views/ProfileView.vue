@@ -78,9 +78,11 @@ export default {
 				if (this.isFollowed) {
 					await this.$axios.delete("/user/" + this.username + "/followers/" + getAuthUsername());
 					this.isFollowed = false;
+					this.nFollowers = this.nFollowers - 1;
 				} else {
 					await this.$axios.put("/user/" + this.username + "/followers/" + getAuthUsername());
 					this.isFollowed = true;
+					this.nFollowers = this.nFollowers + 1;
 				}
 			} catch (e) {
 				this.errormsg = e.toString();
