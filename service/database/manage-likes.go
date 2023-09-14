@@ -29,30 +29,3 @@ func (db *appdbimpl) UnlikePhoto(username string, photoId int64) error {
 	}
 	return nil
 }
-
-func (db *appdbimpl) ListLikes(photoId int64) ([]string, error) {
-	var ret []string
-
-	// Plain simple SELECT
-	rows, err := db.c.Query(`SELECT username FROM likes WHERE photoId=?`, photoId)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = rows.Close() }()
-
-	// Here we read the resultset and we build the list to be returned
-	for rows.Next() {
-		var l string
-		err = rows.Scan(&l)
-		if err != nil {
-			return nil, err
-		}
-
-		ret = append(ret, l)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return ret, nil
-}

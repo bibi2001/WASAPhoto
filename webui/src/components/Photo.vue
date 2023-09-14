@@ -98,17 +98,6 @@ export default {
 			}
 			this.loading = false;
 		},
-		async listLikes() {
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				const response = await this.$axios.get("/photo/" + this.photoId + "/likes");
-				this.likes = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
-		},
 		async likeUnlikeBtn() {
 			this.loading = true;
 			this.errormsg = null;
@@ -169,10 +158,7 @@ export default {
 
 <template>
 	<div v-if="!isDeleted">
-		<div
-			class="photo-separator">
-		</div>
-
+		
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
 		<div class="mb-3">
@@ -227,6 +213,10 @@ export default {
 						class="btn btn-sm btn-outline-secondary">Comment</button>
 				</div>
 			</div>
+		</div>
+
+		<div
+			class="photo-separator">
 		</div>
 
 	</div>

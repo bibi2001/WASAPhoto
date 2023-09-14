@@ -513,32 +513,6 @@ paths:
       security:
       - bearerAuth: [] 
       
-  /photo/{photoId}/likes:
-    parameters:
-      - $ref: "#/components/parameters/photoId"
-    get:
-      tags: ["likes"]
-      summary: get a list of users who liked the photo with the id
-      description: get a list of users who liked the photo with the id
-      operationId: listLikes
-      responses:
-        '200':
-          description: Successfully list photo likes
-          content:
-            application/json:
-              schema:
-                description: List of users who liked the photo
-                type: array
-                items:
-                  $ref: '#/components/schemas/Username'
-                  minItems: 0
-                  maxItems: 200
-        '400':
-          description: Invalid parameters supplied
-        '404': 
-          description: Photo not found
-      security:
-      - bearerAuth: []
   /photo/{photoId}/likes/{username}:
     parameters:
       - $ref: "#/components/parameters/photoId"

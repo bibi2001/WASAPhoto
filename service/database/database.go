@@ -59,7 +59,6 @@ type AppDatabase interface {
 
 	LikePhoto(username string, photoId int64) error
 	UnlikePhoto(username string, photoId int64) error
-	ListLikes(photoId int64) ([]string, error)
 
 	UploadPhoto(username string, caption string) (utils.Photo, error)
 	DeletePhoto(photoId int64) error
