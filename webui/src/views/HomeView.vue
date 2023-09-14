@@ -1,11 +1,21 @@
+<!-- 
+  HomeView.vue shows the feed of the user.
+  The feed is composed by the photos of the followed users of the user.
+  If the user doesn't follow anyone, it shows a card with the text "No photos to show."
+  
+  Endpoints called:
+  GET("/home")
+-->
+
 <script>
 import { getAuthToken } from '../services/tokenService';
 
 export default {
-	data: function() {
+	data: function () {
 		return {
 			errormsg: null,
 			loading: false,
+			
 			photos: [],
 		}
 	},
@@ -18,7 +28,7 @@ export default {
 			this.errormsg = null;
 			try {
 				const response = await this.$axios.get("/home", {
-  					headers: { Authorization: `Bearer ${getAuthToken()}`}
+					headers: { Authorization: `Bearer ${getAuthToken()}` }
 				});
 				this.photos = response.data
 			} catch (e) {
@@ -36,8 +46,7 @@ export default {
 
 <template>
 	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<div class="page-header">
 			<h1 class="h2">Your feed</h1>
 			<div class="btn-toolbar mb-2 mb-md-0">
 				<div class="btn-group me-2">
@@ -57,7 +66,7 @@ export default {
 				<Photo :photoId="photo.photoId"></Photo>
 			</div>
 		</div>
-		<div v-else>
+		<div class="card mt-3" v-else>
 			<div class="card-body">
 				<p>No photos to show.</p>
 			</div>
@@ -67,7 +76,17 @@ export default {
 </template>
 
 <style scoped>
+.page-header { 
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 2px;
+  margin-bottom: 3px;
+  border-bottom: 1px solid #ccc;
+}
 .card {
-	margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 </style>
